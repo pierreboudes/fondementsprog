@@ -23,12 +23,12 @@
 #+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 7 lambda-calcul\end{center}}}\smallskip}
 #+LATEX_HEADER: \usepackage{fancyhdr}
 #+LATEX_HEADER: \usepackage[french]{babel}
-#+EXCLUDE_TAGS:correction
+#+EXCLUDE_TAGS: noexport correction
 
 #+BEGIN_LaTeX
 \pagestyle{fancyplain}
 \fancyhf{}
-\lhead{ \fancyplain{}{Institut Galilée. P. Boudes, J. Leroux et V. Mogbil}}
+\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Leroux et V. Mogbil}}
 \rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
 \rfoot{ \fancyplain{}{\thepage}}
 %\rfoot{ }
@@ -53,7 +53,7 @@ selon une variable, soit l'application d'un terme à un autre :
   t := x \mid \lambda x. t \mid (t\; t)
 \]
 
-où $x$ est n'importe quel élément d'un ensemble de symboles
+\noindent où $x$ est n'importe quel élément d'un ensemble de symboles
 $\mathcal{V}$ choisi une fois pour toute comme ensemble de variables.
 On utilise habituellement les lettres de l'alphabet $a$, $b$, \ldots,
 $x$, $y$, $z$ éventuellement indexés par des entiers, $x_{42}$, comme
@@ -69,7 +69,6 @@ parenthésées à gauche: $((x\; y)\; z)$.
 
 L'ensemble des variables libres d'un lambda-terme est défini par
 induction sur le terme :
-
 #+BEGIN_LaTeX
 \newcommand{\FV}[1]{\ensuremath{\operatorname{FV}(#1)}}
   \begin{align*}
@@ -104,12 +103,13 @@ variable (qui est une feuille) vers la racine de l'arbre. Une variable
 libre est une feuille sans arc sortant.
 
 Avec les arcs lieurs on obtient une arbre appelé arbre du
-lambda-terme. Un exemple est donné figure \ref{fig:as}.
+lambda-terme. Un exemple est donné figure 1.
 
 #+BEGIN_LaTeX
 %\begin{figure}[htbp]
 \begin{wrapfigure}{r}{0.2\textwidth}
-~\hspace{-1cm}\begin{tikzpicture}
+\vspace{-0.7cm}~\hspace{-0.5cm}
+\begin{tikzpicture}[level distance=1cm]
   \node (lx) {$\lambda x$}
     child { node (ly) {$\lambda y$}
       child { node {@}
@@ -120,11 +120,11 @@ lambda-terme. Un exemple est donné figure \ref{fig:as}.
         child { node (y2) {$y$} }
       }
    };
-  \path[->] (y1) edge [out=0, in = -20,  looseness = 1]  (ly);
-  \path[->] (y2) edge [out=30, in = -30,  looseness = 1] (ly);
-  \path[->] (x) edge [out=120, in = 250,  looseness = 1](lx);
+  \path[->] (y1) edge [out=0, in = -20,  looseness = 1.2]  (ly);
+  \path[->] (y2) edge [out=40, in = -40,  looseness = 0.8] (ly);
+  \path[->] (x) edge [out=110, in = 250,  looseness = 1](lx);
   \end{tikzpicture}
-\vspace{-1cm}
+\vspace{-0.5cm}
 \label{fig:as}
 \caption{arbre du terme $\lambda xy. ((x\; y)\; y)$}
 \end{wrapfigure}
@@ -234,14 +234,20 @@ Réduire et donner la forme normale des termes suivants :
  calcul. Nous allons essayer de calculer un peu avec ses entiers.
 
 *** Successeur
-Donner un lambda-terme $\overline{succ}$ qui représente l'opération
+Donner un lambda-terme $\operatorname{succ}$ qui représente l'opération
 successeur sur les entiers de Church, c'est à dire tel que pour
-n'importe quel entier naturel $n$, $(\overline{succ}\; \overline{n})$ se
+n'importe quel entier naturel $n$, $(\operatorname{succ}\; \overline{n})$ se
 $\beta$-réduit en $\overline{n + 1}$. Tester.
 
 *** Addition
-Donner un lambda-terme $\overline{add}$ qui représente l'addition de
-deux entiers.
+Donner un lambda-terme $\operatorname{add}$ qui représente l'addition de
+deux entiers. C'est-à-dire tel que pour n'importe quels entiers $n$ et
+$n$, $(\operatorname{add}\; \overline{n}\; \overline{m})$ se
+$\beta$-réduit en $\overline{n + m}$.
 
 *** Multiplication
 Même question pour la multiplication $\overline{mult}$.
+*** Test à zéro
+ Donner un lambda-terme $\operatorname{ifzero}$ qui, lorsqu'il est appliqué à un entier
+ $\overline{n}$ et deux termes $t_1$ et $t_2$, se $\beta$-réduit en $t_1$
+ si $n = 0$ et en $t_2$ sinon.
