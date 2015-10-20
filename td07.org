@@ -1,0 +1,247 @@
+#+TITLE:   Fondements de la programmation lambda-calcul
+#+AUTHOR:   P. Boudes
+#+EMAIL:    boudes@univ-paris13.fr
+
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  fr
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc toc:nil
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
+#+STARTUP: latex nolatexpreview entitiesplain
+#+LaTeX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [11pt, a4paper]
+#+LATEX_HEADER: \usepackage[margin=2cm]{geometry}
+#+LATEX_HEADER: \usepackage[table]{xcolor}
+#+LATEX_HEADER: \usepackage{xspace}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \usepackage{bussproofs}
+#+LATEX_HEADER: \usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
+#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 7 lambda-calcul\end{center}}}\smallskip}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+#+LATEX_HEADER: \usepackage[french]{babel}
+#+EXCLUDE_TAGS:correction
+
+#+BEGIN_LaTeX
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{Institut Galilée. P. Boudes, J. Leroux et V. Mogbil}}
+\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsubsection}[1]{\question[#1.]}
+#+END_LaTeX
+
+
+
+
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+
+Un lambda-terme $t$ est une expression syntaxique qui est soit
+simplement une variable, soit l'abstraction d'un autre lambda-terme
+selon une variable, soit l'application d'un terme à un autre :
+
+\[
+  t := x \mid \lambda x. t \mid (t\; t)
+\]
+
+où $x$ est n'importe quel élément d'un ensemble de symboles
+$\mathcal{V}$ choisi une fois pour toute comme ensemble de variables.
+On utilise habituellement les lettres de l'alphabet $a$, $b$, \ldots,
+$x$, $y$, $z$ éventuellement indexés par des entiers, $x_{42}$, comme
+ensemble de variables. Il est habituel de raccourcir les notations des
+lambdas en notant $\lambda x_1\ldots x_n. t$ au lieu de $\lambda
+x_1.\lambda x_2.\ldots \lambda x_n. t$. Par exemple on écrira $\lambda
+xy. x$ au lieu de $\lambda x.\lambda y. x$. On doit parfois ajouter
+des parenthèses autour des sous-expressions $\lambda x. t$ pour éviter
+une ambiguité. Par exemple, on écrit $((\lambda x. x)\; y)$. Par
+contre on peut omettre nombre de parenthèses d'application en prenant
+comme convention que les expressions comme $x\; y\; z$ sont
+parenthésées à gauche: $((x\; y)\; z)$.
+
+L'ensemble des variables libres d'un lambda-terme est défini par
+induction sur le terme :
+
+#+BEGIN_LaTeX
+\newcommand{\FV}[1]{\ensuremath{\operatorname{FV}(#1)}}
+  \begin{align*}
+    \FV x &= \{x\}\\
+    \FV{\lambda x. t} &= \FV{t} - \{x\}\\
+    \FV{(t\; u)} &= \FV{t} \cup \FV{u}
+  \end{align*}
+#+END_LaTeX
+De même, l'ensemble des variables liées d'un lambda-terme est défini
+par induction sur le terme :
+#+BEGIN_LaTeX
+\newcommand{\BV}[1]{\ensuremath{\operatorname{BV}(#1)}}
+  \begin{align*}
+    \BV x &= \emptyset \\
+    \BV{\lambda x. t} &= \BV{t} \cup \{x\}\\
+    \BV{(t\; u)} &= \BV{t} \cup \BV{u}
+ \end{align*}
+#+END_LaTeX
+Remarques : ce sont les lambdas qui lient les variables; une variable
+libre est simplement une variable qui n'est pas liée.
+
+
+Lorsqu'on écrit un lambda-terme sous forme d'arbre syntaxique, les
+$\lambda. x$ sont des nœuds unaires, les applications sont des nœuds
+binaires, habituellement dénotés par le symbole @, et les variables
+correspondent aux feuilles. On peut alors ajouter à cet arbre
+syntaxique des arcs liant chaque variable liée au lambda qui la lie.
+
+Le lambda qui lie une variable est le premier lambda portant
+sur le même symbole de variable que l'on rencontre en remontant de la
+variable (qui est une feuille) vers la racine de l'arbre. Une variable
+libre est une feuille sans arc sortant.
+
+Avec les arcs lieurs on obtient une arbre appelé arbre du
+lambda-terme. Un exemple est donné figure \ref{fig:as}.
+
+#+BEGIN_LaTeX
+%\begin{figure}[htbp]
+\begin{wrapfigure}{r}{0.2\textwidth}
+~\hspace{-1cm}\begin{tikzpicture}
+  \node (lx) {$\lambda x$}
+    child { node (ly) {$\lambda y$}
+      child { node {@}
+        child { node {@}
+          child { node (x) {$x$} }
+          child { node (y1) {$y$} }
+        }
+        child { node (y2) {$y$} }
+      }
+   };
+  \path[->] (y1) edge [out=0, in = -20,  looseness = 1]  (ly);
+  \path[->] (y2) edge [out=30, in = -30,  looseness = 1] (ly);
+  \path[->] (x) edge [out=120, in = 250,  looseness = 1](lx);
+  \end{tikzpicture}
+\vspace{-1cm}
+\label{fig:as}
+\caption{arbre du terme $\lambda xy. ((x\; y)\; y)$}
+\end{wrapfigure}
+%\end{figure}
+#+END_LaTeX
+
+Deux termes dont les arbres sont égaux sauf éventuellement pour le nom
+de leurs variables liées sont dits $\alpha$-équivalents. On peut
+toujours renommer n'importe quelle variable liée d'un terme ou d'un
+sous-terme pour obtenir un terme $\alpha$-équivalent.
+
+Sur les arbres, la *substitution* d'une variable libre $x$ par un terme
+$u$ dans un terme $t$ consiste en remplacer dans l'arbre de $t$ chaque
+feuille $x$ non liée par l'arbre de $u$. On note $t[x:=u]$ le
+lambda-terme obtenu.
+
+Si on n'y prend pas garde on risque la capture de variables des
+variables qui étaients libres dans $u$ se retrouvent liées dans
+$t[x:=u]$. On considéra uniquement la substitution sans capture de
+variables. C'est à dire que l'opération de substitution n'a de sens qu'à
+$\alpha$-renommage près, de tel sorte que tout capture de variable
+libre de $u$ par un lieur de $t$ soit évité par un renommage des
+variables liées de $t$ en choisissant des noms différents des
+variables libre de $u$.
+
+Un terme de la forme $((\lambda x. t)\; u)$ est
+appelé un *rédex*. Il se $\beta$ réduit en une étape en le terme
+$t[x:=u]$. Un rédex peut aussi apparaître dans un sous-terme (une
+sous-expression).
+
+Un terme sans rédex est dit en forme normale.
+
+Un terme peut avoir plusieurs rédex comme sous-termes. La $\beta$-réduction peut alors
+s'appliquer à n'importe lequel des sous-termes. Le choix du rédex à
+réduire peut éventuellement être fixé par une stratégie de réduction.
+
+Partant d'un terme avec rédex si on arrive à une forme normale alors elle
+est unique, quel que soit le chemin de réduction.
+
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+
+* Exercices
+
+**  Variables libres, variables liées, alpha-équivalence
+*** Variables libres et liées
+Donner l'ensemble des variables libres et l'ensemble des variables liées
+des termes suivants :
+#+BEGIN_LaTeX
+\begin{multicols}{3}
+#+END_LaTeX
+1. $(x\; y)$
+2. $(x\; (\lambda y. y))$
+3. $\lambda xyz. (x\; (y\; z))$
+4. $((\lambda xyz. (x\; y))\; z)$
+5. $((\lambda x. (x\; y))\; x)$
+6. $((\lambda x. x)\;(\lambda x. x))$
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+*** $\alpha$-équivalence
+Pour chacun des deux derniers termes de l'exercice précédent donner un terme qui lui est
+$\alpha$-équivalent et utilise un maximum de noms de variables.
+** Substitution, réductions
+*** Substitutions
+Effectuer les substitutions suivantes :
+#+BEGIN_LaTeX
+\begin{multicols}{3}
+#+END_LaTeX
+1. $x[x:=y]$
+2. $(x\; y)[x:=\lambda z. z]$
+3. $(x\; x)[x:=\lambda z. z]$
+4. $(x\; x)[y:=\lambda z. z]$
+5. $((\lambda x. (x\; y))\; x)[x:=z]$
+6. $((\lambda x. (x\; y))\; y)[y:=z]$
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+*** Réductions
+Réduire et donner la forme normale des termes suivants :
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+1. $((\lambda x. x)\;((\lambda x. x)\;(\lambda x. x)))$
+2. $((\lambda x. (x\; x))\;(\lambda z. z))$
+3. $((\lambda xy. y)\; f\; g)$
+4. $((\lambda xy. (x\; (x\; (x\; y))))\; (\lambda x.z))$
+5. $((\lambda x. (x\; x))\;(\lambda x. (x\; x)))$
+6. $((\lambda f.(\lambda x.f (x\; x))\; (\lambda x.f (x\; x)))\; g)$
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+** Entiers de Church
+ On se donne un ensemble de lambda-termes pour représenter les entiers
+ naturels. On représente le zéro par le terme $\lambda fx. x$, le un
+ par le terme $\lambda fx. (f\; x)$, le deux par le terme $\lambda fx.
+ (f\; (f\; x))$ et plus généralement l'entier $n$ est représenté par
+ le terme noté $\overline{n}$ : \[ \overline{n} := \lambda fx.
+ (\underbrace{f\;\ldots\; (f}_{n}\; x)). \] Cette représentation est
+ appelée entiers de Church du nom du mathématicien Alonzo Church, qui
+ inventa le lambda-calcul et montra que toutes les fonctions
+ calculables sur les entiers peuvent être représentées par des
+ lambda-termes en utilisant la $\beta$-réduction pour effectuer le
+ calcul. Nous allons essayer de calculer un peu avec ses entiers.
+
+*** Successeur
+Donner un lambda-terme $\overline{succ}$ qui représente l'opération
+successeur sur les entiers de Church, c'est à dire tel que pour
+n'importe quel entier naturel $n$, $(\overline{succ}\; \overline{n})$ se
+$\beta$-réduit en $\overline{n + 1}$. Tester.
+
+*** Addition
+Donner un lambda-terme $\overline{add}$ qui représente l'addition de
+deux entiers.
+
+*** Multiplication
+Même question pour la multiplication $\overline{mult}$.
