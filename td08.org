@@ -1,0 +1,243 @@
+#+TITLE:   Fondements de la programmation lambda-calcul
+#+AUTHOR:   Pierre Boudes
+#+EMAIL:    boudes@univ-paris13.fr
+
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  fr
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc toc:nil
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
+#+STARTUP: latex nolatexpreview entitiesplain
+#+LaTeX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [11pt, a4paper]
+#+LATEX_HEADER: \usepackage[margin=2cm]{geometry}
+#+LATEX_HEADER: \usepackage[table]{xcolor}
+#+LATEX_HEADER: \usepackage{xspace}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \usepackage{bussproofs}
+#+LATEX_HEADER: \usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
+#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 8 lambda-calcul\end{center}}}\smallskip}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+#+LATEX_HEADER: \usepackage[french]{babel}
+#+EXCLUDE_TAGS: noexport correction
+
+#+BEGIN_LaTeX
+\EnableBpAbbreviations
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Leroux et V. Mogbil}}
+\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsubsection}[1]{\question[#1.]}
+#+END_LaTeX
+
+
+
+
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+
+
+
+Un *type simple* est soit un élément d'un ensemble choisi une fois pour
+toute de types atomiques, soit une flèche entre deux types :
+\[
+A := \alpha \mid A\to B
+\]
+où $\alpha$ est un type atomique.
+
+Un lambda-terme $t$ est typable lorsqu'on peut lui donner un type (ici
+parmi les types simples). Les lambda-termes typables sont définis par
+induction sur la syntaxe.
+
+Intuitivement cela se fait comme ceci (mais nous allons voir qu'il y a
+un problème).
+#+BEGIN_LaTeX
+\begin{gather}
+t := x^A \mid \overbrace{ \lambda x^A. t^B }^{A\to B} \mid ( \overbrace{ t^{A\to B} u^A) }^{B}
+\label{intuit}
+\end{gather}
+%\vspace{-\baselineskip}
+#+END_LaTeX
+Une variable est toujours typable, et on peut lui donner
+n'importe quel type. Si $u$ est un lambda-terme typable auquel on peut
+donner le type $A\to B$ et si $v$ est un lambda-terme typable auquel
+on peut donner le type $A$, alors $(u\; v)$ est un lambda-terme
+typable et on peut lui donner le type $B$. Enfin si $t$ est un
+lambda-terme typable auquel on peut donner le type $B$ et $x$ est une
+variable à laquelle /on a donné/ le type $A$ en typant $t$, alors
+$\lambda x. t$ est typable, de type $A\to B$. Le point important ici,
+est que toutes les occurrences de la variable libre $x$ doivent avoir
+ce même type $A$ à l'intérieur de $t$. Mais comment l'exprimer
+correctement ?
+
+Officiellement, cela se fait en introduisant les notions de contexte
+de typage et de jugement de typage dans l'induction. Un contexte de
+typage, est un tableau associatif (un dictionnaire en Python), dont
+les clés sont des variables et dont les valeurs sont des types
+simples. Un contexte de typage associe donc un unique type simple à
+chaque variable d'un ensemble fini donné de variables. On note
+traditionnellement $x : A$, l'association du type $A$ à la variable
+$x$, $\Gamma$ un contexte de typage et on utilise la virgule pour
+dénoter l'union disjointe de contextes. Ainsi $\Gamma, x : A$ signifie
+le contexte de typage formé en prenant un contexte $\Gamma$ non défini
+pour la clé $x$ et en l'étendant en donnant à la clé $x$ la valeur
+$A$.
+
+Un jugement de typage $\Gamma \vdash t: A$ permet d'associer un type
+$A$ à un terme $t$ dans un contexte $\Gamma$. On peut alors corriger
+l'induction précédente en disant qu'un jugement de typage est valide
+s'il peut être dérivé grâce aux régles suivantes :
+#+BEGIN_LaTeX
+  \begin{gather*}
+    \AXC{}\RL{id}
+  \UIC{$\Gamma, x:A\vdash x:A$}
+  \DP\quad
+  \AXC{$\Gamma, x:A\vdash t:B$}\RL{abs.}
+  \UIC{$\Gamma \vdash \lambda x. t:A \to B$}
+  \DP\\[0.5cm]
+  \AXC{$\Gamma\vdash u:A\to B$}
+  \AXC{$\Gamma\vdash v:A$}\RL{app.}
+  \BIC{$\Gamma \vdash (u\; v): B$}
+  \DP
+  \end{gather*}
+#+END_LaTeX
+Le point important est que pour la règle d'application, $u$ et $v$ ont
+été typés en utilisant un même contexte, c'est à dire en donnant le
+même type aux variables de même nom. Si un jugement de typage est
+valide, le contexte de typage contient nécessairement toutes les
+variables libres du terme.
+
+Ces règles définissent un système d'inférence similaire au calcul des
+séquents. Une inférence de typage est un arbre dont chaque noeud est
+un instance de règle, chaque feuille une instance d'axiome, de telle
+sorte que chaque arête mette en relation un même séquent à chaque
+extrémité.
+
+Une autre façon pratique de voir le typage des lambda-termes est de ne
+considérer que des lambda-termes dans lesquels les variables liées
+sont choisies toutes différentes par $\alpha$-renommage (on ne peut
+pas écrire $(\lambda x. x\; (\lambda x. x)$, on écrit $(\lambda x. x\;
+(\lambda y. y)$) et dans lesquels on a choisi pour chaque variable un
+type unique (on annote les occurrences de variables dans le terme avec
+leur type). Ce choix est l'équivalent du choix d'un contexte de typage
+qui inclue les . Si le lambda-terme est typable dans un tel contexte,
+il a alors type unique et on peut trouver son type en suivant la
+structure syntaxique du terme comme dans \ref{intuit}.
+
+Un lambda-terme pur peut ne correspondre à aucun terme typé comme il
+peut correspondre à plusieurs termes typés (il peut n'y avoir aucune
+façon de le décorer avec des types comme il peut y en avoir
+plusieurs).
+
+
+Les types sont conservés par $\beta$-conversion. (La substitutution est
+faîte en utilisant un terme de même type que la variable substitué).
+
+Il existe des termes non typables qui se réduisent en des
+termes typables.
+
+Le calcul typé est fortement normalisant : n'importe quelle série de
+réductions amène à une forme normale (et cette forme normale est unique
+pour tous les chemins de réduction). Il n'est donc pas Turing complet.
+
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+* Exercices
+
+** Inférence de type
+Donner un type à chacun des termes suivants, lorsque c'est possible :
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+
+1. $\lambda x. x$
+2. $\lambda xf. (f\; (f\; (f\; x)))$
+3. $\lambda xyz. ((x\; y)\; z)$
+4. $((\lambda x. x)\; (\lambda x. x))$
+5. $(x\; y)$
+6. $(x\; x)$
+7. $\lambda f.(\lambda x.f (x\; x)) (\lambda x.f (x\; x))$
+10. Les entiers de Church et les opérations que nous avons défini sur ces entiers.
+
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+
+** Terme non typable
+Donner un exemple de terme non typable qui se réduit en un terme
+typable.
+
+*** Solution                                                     :correction:
+Par exemple $(\operatorname{false}\;\Delta)$ (c'est à dire $(\lambda
+fg. g\; \lambda x. (x\; x))$) qui se réduit en le terme typable
+identité ($\lambda g. g$).
+
+** Termes d'un type donné
+Pour chacun des types suivants, donner un terme clos (sans variable libre) de ce type.
+1. $\alpha\to\alpha$
+2. $(\alpha\to\alpha)\to(\alpha\to\alpha)$
+3. $\alpha\to((\alpha\to\beta)\to\beta)$.
+
+*** Solution                                            :correction:
+L'identité pour le premier, puis un entier de Church quelconque pour
+le second, $\lambda xf.(f x)$ pour le dernier.
+
+
+** Prédécesseur (difficile)
+
+Trouver un $\lambda$-terme $\operatorname{pred}$ qui calcule le
+prédécesseur sur les entiers de Church, c'est à dire tel que appliqué
+à un entier $\overline{n}$ de Church se $\beta$-réduit en $\overline{n -
+1}$ si $n > 0$ et en $\lambda fx. x$ (c'est à dire $\overline{0}$) sinon.
+
+** Combinateur de point fixe Y de Church
+Soit :
+#+BEGIN_LaTeX
+\begin{gather*}
+   Y = \lambda f.(\lambda x.f (x\; x)) (\lambda x.f (x\; x))
+  \end{gather*}
+#+END_LaTeX
+Dans le lambda-calcul pur, pour $f$ terme quelconque, montrer que $(Y f) \equiv_{\beta} (f (Y f))$.
+
+*** Solution                                                   :correction:
+On montre que $(Y\; f)$ est $\beta$ equivalent à $(f (Y
+f))$, c'est à dire qu'il y a un terme en lequel se réduisent chacun de
+ces deux termes.
+#+BEGIN_LaTeX
+  \begin{align*}
+    (Y\; f)&= (\lambda f.(\lambda x.f (x\; x)) (\lambda x.f (x\; x))\;
+    f)\\
+  &\to_{\beta} \underbrace{((\lambda x.f (x\; x))\; (\lambda x.f (x\; x)))}_{t}\\
+  &\to_{\beta} (f \; \underbrace{((\lambda x.f (x\; x))\;(\lambda x.f (x\; x)))}_{t})
+  \end{align*}
+#+END_LaTeX
+On a $(Y\; f)\to_{\beta}  t$, donc $(f\;(Y\; f))\to_{\beta} (f\; t)$
+et $(Y\; f)\to_{\beta} (f\; t)$ donc ces deux termes sont $\beta$-équivalents.
+
+** Fonction récursive en lambda-calcul
+Définir la fonction factorielle en lambda-calcul pur (sur les entiers
+de Church). Indication : cette fonction doit être le point fixe d'un
+fonction définie par cas.
+
+*** Solution                                                   :correction:
+On pose $h = \lambda gn. \operatorname{ifthenelse}\;
+(\operatorname{iszero}\; n)\; \underline{1}\; (\operatorname{mult}\; n \; (g \; (\operatorname{pred}
+\; n)))$. On a alors que factorielle est le terme $\operatorname{fact}
+= (Y\; h)$. On vérifie le fonctionnement sur des exemples
+comme  $(\operatorname{fact} 0)$ et $(\operatorname{fact} 2)$ ou  $(\operatorname{fact} 3)$. Puis plus
+formellement on établit que  $\operatorname{fact} \underline{0}$ et $\operatorname{fact} \underline{n + 1}$
+sont $\beta$-équivalents respectivement à $\underline{1}$ et à
+$(\operatorname{mult}\;\underline{n + 1} \; (\operatorname{fact}\; \underline{n}))$.
