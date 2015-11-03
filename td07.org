@@ -28,7 +28,7 @@
 #+BEGIN_LaTeX
 \pagestyle{fancyplain}
 \fancyhf{}
-\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Leroux et V. Mogbil}}
+\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Le Roux et V. Mogbil}}
 \rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
 \rfoot{ \fancyplain{}{\thepage}}
 %\rfoot{ }
