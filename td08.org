@@ -63,7 +63,7 @@ Intuitivement cela se fait comme ceci (mais nous allons voir qu'il y a
 un problème).
 #+BEGIN_LaTeX
 \begin{gather}
-t := x^A \mid \overbrace{ \lambda x^A. t^B }^{A\to B} \mid ( \overbrace{ t^{A\to B} u^A) }^{B}
+t := x^A \mid \overbrace{ \lambda x^A. t^B }^{A\to B} \mid ( \overbrace{ u^{A\to B} v^A) }^{B}
 \label{intuit}
 \end{gather}
 %\vspace{-\baselineskip}
@@ -126,12 +126,12 @@ extrémité.
 Une autre façon pratique de voir le typage des lambda-termes est de ne
 considérer que des lambda-termes dans lesquels les variables liées
 sont choisies toutes différentes par $\alpha$-renommage (on ne peut
-pas écrire $(\lambda x. x\; (\lambda x. x)$, on écrit $(\lambda x. x\;
-(\lambda y. y)$) et dans lesquels on a choisi pour chaque variable un
+pas écrire $(\lambda x. x\; \lambda x. x)$, on écrit $(\lambda x. x\;
+\lambda y. y)$) et dans lesquels on a choisi pour chaque variable un
 type unique (on annote les occurrences de variables dans le terme avec
 leur type). Ce choix est l'équivalent du choix d'un contexte de typage
-qui inclue les . Si le lambda-terme est typable dans un tel contexte,
-il a alors type unique et on peut trouver son type en suivant la
+étendu aux variables liées. Si le lambda-terme est typable dans un tel contexte,
+il a alors un type unique et on peut trouver son type en suivant la
 structure syntaxique du terme comme dans \ref{intuit}.
 
 Un lambda-terme pur peut ne correspondre à aucun terme typé comme il
@@ -141,7 +141,7 @@ plusieurs).
 
 
 Les types sont conservés par $\beta$-conversion. (La substitutution est
-faîte en utilisant un terme de même type que la variable substitué).
+faite en utilisant un terme de même type que la variable substituée).
 
 Il existe des termes non typables qui se réduisent en des
 termes typables.
