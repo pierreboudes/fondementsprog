@@ -20,7 +20,7 @@
 #+LATEX_HEADER: \usepackage{multicol}
 #+LATEX_HEADER: \usepackage{bussproofs}
 #+LATEX_HEADER: \usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
-#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 9 lambda-calcul\end{center}}}\smallskip}
+#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 9 et 10 lambda-calcul\end{center}}}\smallskip}
 #+LATEX_HEADER: \usepackage{fancyhdr}
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
@@ -36,9 +36,10 @@
 \newcounter{questioncount}
 \setcounter{questioncount}{0}
 \newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
-\renewcommand{\subsubsection}[1]{\question[#1.]}
+\renewcommand{\subsubsection}[1]{\question[#1]}
 \newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
 \newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
+\newcommand{\fix}{\mathop{\texttt{fix}}}
 #+END_LaTeX
 
 
@@ -91,6 +92,20 @@ règle qui permette de réduire sous une abstraction.
 Nous reviendrons plus en détails sur les différentes stratégies
 d'évaluation possibles.
 
+*Unicité du typage.* Nous utilisons désormais une version du lambda-calcul
+simplement typé où chaque variable liée par un lambda est annotée par
+un type, comme ceci : $\lambda x[T]. t$, de telle sorte que $T$ soit
+le type associé à la variable $x$ au moment du jugement de typage :
+#+BEGIN_LaTeX
+  \begin{gather*}
+    \AXC{$\Gamma, x:A\vdash t:B$}\RL{abs.}
+    \UIC{$\Gamma \vdash \lambda x[A]. t:A \to B$}
+  \DP
+  \end{gather*}
+#+END_LaTeX
+De cette façon, étant donné un contexte de typage $\Gamma$, et un
+terme $t$ ainsi annoté il existe au plus un type $T$ tel que
+$\Gamma\vdash t: T$.
 
 Nous allons maintenant
 donner des *extensions du lambda-calcul* *simplement typé* de façon à en
@@ -99,8 +114,8 @@ caractéristiques d'un langage de type ML (les langages ML comme SML,
 CAML sont inspirés des extensions du lambda-calcul et en particulier
 du langage PCF, /programming/ /computable/ /functions/).
 
-*Unit*. On ajoute un terme
-~unit~ qui sera aussi une valeur, et son type, ~Unit~.
+*Unit*. On ajoute une valeur
+~unit~  de type, ~Unit~.
 #+BEGIN_LaTeX
   \begin{align*}
     t &:= \ldots \mid \texttt{unit}\\
@@ -116,7 +131,7 @@ du langage PCF, /programming/ /computable/ /functions/).
 Ceci nous permet d'introduire une /forme dérivée/:
 #+BEGIN_LaTeX
 \[
-t_1;t2 \eqdef (\lambda x[\texttt{Unit}]. t_2\;\; t_1)\quad (x\notin FV(t_2)).
+t_1;t_2 \eqdef (\lambda x[\texttt{Unit}]. t_2\;\; t_1)\quad (x\notin FV(t_2)).
 \]
 #+END_LaTeX
 Cette mise en séquence, $t_1; t_2$ a pour effet d'évaluer
@@ -143,7 +158,7 @@ d'évaluation et de typage induites sur la forme sont :
     \AXC{}
     \UIC{$\texttt{let }x = v_1\texttt{ in } t_2 \to t_2[x := v_1]$}\tabDP\\
     \AXC{$t_1 \to t'_1$}
-    \UIC{$\texttt{let }x = t_1\texttt{ in } \to \texttt{let }x = t'_1\texttt{ in } t_2 $}\tabDP\\
+    \UIC{$\texttt{let }x = t_1\texttt{ in } t_2 \to \texttt{let }x = t'_1\texttt{ in } t_2 $}\tabDP\\
   \AXC{$\Gamma \vdash t_1: T_1$}
   \AXC{$\Gamma, x : T_1 \vdash t_2: T_2$}
   \BIC{\Gamma\vdash \texttt{let }x = t_1\texttt{ in } t_2 :  T_2$}
@@ -152,14 +167,13 @@ d'évaluation et de typage induites sur la forme sont :
 #+END_LaTeX
 
 Au premier abord, cette forme $\texttt{let }x = t_1\texttt{ in } t_2$
-est juste du sucre syntaxique pour $(\lambda x: T_1. t_2\; t_1)$. Pour
+est juste du sucre syntaxique pour $(\lambda x[T_1]. t_2\; t_1)$. Pour
 /désugariser/ il faudra toutefois trouver l'annotation de type pour
 $\lambda x$, donc faire l'inférence de type avant.
 
 *Combinateur de point fixe*. Pour chaque type $T_1$ on se donne
  un  opérateur sur les termes ~fix~ tel que :
 #+BEGIN_LaTeX
-\newcommand{\fix}{\mathop{\texttt{fix}}}
   \begin{gather*}
     t := \ldots \mid (\fix\; t)\\
   \AXC{}
@@ -179,6 +193,101 @@ Forme dérivée:
   \texttt{let } x = (\fix \;\lambda x[T_1]. t_1) \texttt{ in }   t_2
   \end{align*}
 #+END_LaTeX
+
+
+On peut construire des types de données composées, le plus simple d'entre eux étant les *paires* :
+#+BEGIN_LaTeX
+  \begin{align*}
+    t &:= \ldots \mid \{t, t\} \mid t.1 \mid t.2\\
+    v &:= \ldots \mid \{t, t\}\\
+    T &:= \ldots \mid T_1\times T_2
+  \end{align*}
+#+END_LaTeX
+Règles de réduction des paires :
+#+BEGIN_LaTeX
+  \begin{gather*}
+  \AXC{$t\to t'$}
+\LL{$i = 1, 2$}
+  \UIC{$t.i\to t'.i$}
+  \tabDP\quad
+  \AXC{}
+\RL{$i = 1, 2$}
+  \UIC{$\{v_1, v_2\}.i \to v_i$}\tabDP
+  \\
+  \AXC{$t_1\to t'_1$}
+  \UIC{$\{t_1, t_2\}\to \{t'_1, t_2\}$}
+  \tabDP\quad
+  \AXC{$t_2\to t'_2$}
+  \UIC{$\{v_1, t_2\}\to \{v_1, t'_2\}$}
+  \tabDP
+  \end{gather*}
+#+END_LaTeX
+Règles de typage des paires :
+#+BEGIN_LaTeX
+\begin{gather*}
+  \AXC{$\Gamma \vdash t_1: T_1$}
+  \AXC{$\Gamma \vdash t_2: T_2$}
+  \BIC{$\Gamma \vdash \{t_1, t_2\}: T_1 \times T_2$}\DP
+\quad
+\AXC{$\Gamma \vdash t: T_1\times T_2$}
+\UIC{$\Gamma \vdash t.i : T_i$}
+\LL{$i = 1, 2$}
+\DP
+\end{gather*}
+#+END_LaTeX
+
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+* Exercices
+
+*** Typage.
+Typer les termes suivants en utilisant les extensions appropriées du
+lambda-calcul.
+1. $\texttt{let } f = \lambda xy. x \texttt{ in } \lambda abc. (f\;
+   (f\; a\; b)\; c)$.
+2. $(\lambda xy.x \; \texttt{unit} \; (\lambda z. z)); \lambda xy. y$
+3. $(\fix \; \lambda x. x)$
+4. $(\fix \; \lambda xy. x)$
+4. $\texttt{letrec } f = \lambda ghx. (g \; x\; (f\; g\; h\; (h\; x))
+   \; (h\; x))\texttt{ in } (f\; (\lambda xyz. z)\; (\lambda z. z))$
+8. $\lambda x. x.1$
+9. $\lambda xy. \{x, y\}$
+
+** Letrec
+*** Question de partiel.
+Dans un letrec qu'est-ce qui s'apparente à du sucre syntaxique (ou une
+forme dérivée) et qu'est ce qui est une véritable extension du
+lambda-calcul simplement typé ?
+*** Fonctions récursives.
+Définir factorielle à l'aide d'un letrec puis supprimer le sucre
+syntaxique. De même pour la fonction de Fibonacci.
+
+*** Récursion.
+La plupart du temps un letrec sert à définir une fonction, c'est à
+dire un terme de type $T_1\to T_2$, pour un certain $T_1$ et un
+certain $T_2$. Pouvez-vous trouver une expression définie
+récursivement et qui soit d'un type autre qu'une flèche ?
+
+** Preuves par induction sur les jugements de typage
+*** Affaiblissement
+(importation dans d'autres contextes).
+Prouver que, en lambda-calcul simplement typé, si $\Gamma\vdash t: T$
+alors pour n'importe quel $x\not\in FV(t)$, $\Gamma, x:T'\vdash t: T$.
+
+En déduire que si $\Gamma\vdash t: T$
+alors $\Gamma,
+x_1:T_1, \ldots, x_n:T_n\vdash t: T$,  pour n'importe quels
+$x_1,\ldots,x_n\not\in FV(t)$.
+
+*** Substitution
+(modularité et liaison.)
+Prouver que si $\Gamma, x : T' \vdash t : T$ et $\Gamma \vdash t' :
+T'$, alors $\Gamma \vdash t[x:=t'] : T$.
+
+
+
 
 * plus tard :noexport:
 
