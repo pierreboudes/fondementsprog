@@ -1,0 +1,240 @@
+#+TITLE:     Première session de fondements de la programmation
+#+AUTHOR:    Pierre Boudes
+#+EMAIL:     boudes@univ-paris13.fr
+
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  fr
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc toc:nil
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
+#+STARTUP: latex
+#+LaTeX_CLASS: article
+#+LaTeX_CLASS_OPTIONS:[11pt,a4paper]
+#+LATEX_HEADER: \usepackage[scale=0.8]{geometry}
+#+LATEX_HEADER: \usepackage[table]{xcolor}
+#+LATEX_HEADER: \usepackage{xspace}
+#+LATEX_HEADER: \usepackage{enumitem}
+#+LATEX_HEADER: \hypersetup{backref, colorlinks=true}
+#+LATEX_HEADER: \usepackage{fancyhdr}
+#+LATEX_HEADER: \usepackage{bussproofs}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \renewcommand{\maketitle}{{~\bigskip\begin{center}\LARGE {Examen de fondements de la programmation \\ mardi 15 décembre 2015 }\end{center}}\medskip}
+
+
+#+BEGIN_LaTeX
+\EnableBpAbbreviations
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Le Roux et V. Mogbil}}
+\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsection}[1]{\question[#1]}
+\newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
+\newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
+\newcommand{\fix}{\mathop{\texttt{fix}}}
+#+END_LaTeX
+
+#+BEGIN_LaTeX
+\newcommand{\cons}{\mathrel{::}}
+#+END_LaTeX
+
+
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+
+
+* Concepts et langages
+
+Soit un premier programme C ~if_fonction.c~:
+#+BEGIN_SRC C
+void my_if(int a, int b) {
+  if (a) {
+    b;
+  }
+}
+
+int double(int x){
+  printf("double %d\n", x);
+  return 2 * x;
+}
+
+int main () {
+  my_if(1 < 0, double(2));
+  return EXIT_SUCCESS;
+}
+#+END_SRC
+Et un second programme C, ~if_direct.c~ :
+#+BEGIN_SRC C
+int double(int x){
+  printf("double %d\n", x);
+  return 2 * x;
+}
+
+int main () {
+  if (1 < 0) {
+    double(2);
+  }
+  return EXIT_SUCCESS;
+}
+#+END_SRC
+Rappeler quelle est stratégie d'évaluation du C (par nom, par valeur,
+paresseuse ?). Pour chacun de ces deux programmes quel sera l'affichage obtenu ?
+
+\columnbreak
+* $\lambda$-calcul et typage
+
+** Inférences de types.
+Pour chacun des termes suivants, typer le terme à l'aide d'une
+inférence de type ou expliquer pourquoi il n'est pas
+typable.
+1. $(\lambda x. x\; \lambda y. y)$
+1. $\lambda xy. (x\; (x\; y))$
+2. $\lambda x. (\lambda z. ((x\; z)\; z)\; x)$
+4. $\lambda xy.  \{x.1, y.2\}$
+5. $\lambda x. x\; ; \lambda y. y$
+6. $\lambda f. (f\; (\lambda x. (f\; (\lambda y. x))))$
+
+** Extension 1 : mise en séquence.
+La mise en séquence $t_1 ; t_2$ n'est possible qu'à une condition sur le
+type de $t_1$. Rappeler laquelle. Étant donné un type $T$ arbitraire, donner un
+lambda terme $\texttt{ignore}_T$ tel que pour tout terme t_1 de type $T$ il
+soit possible d'ignorer la valeur de sortie de $t_1$ pour le mettre en
+séquence avec n'importe quel terme $t_2$ comme ceci: $(\texttt{ignore}_T \; t_1); t_2$
+(indication: la réponse est très simple).
+
+
+** Entiers de Church
+
+Pour $\alpha$ un type donné, on définit le type $N_\alpha$ comme étant égal
+à $(\alpha \to \alpha) \to (\alpha \to \alpha)$. Montrer que l'on peut donner ce type à l'entier
+de Church $\lambda fx. (f \; (f \; (f x)))$.
+
+1. Existe-il un entier de Church que l'on puisse typer autrement
+   qu'avec un type de la forme $N_{\alpha}$ pour $\alpha$ choisi ?
+2. On rappelle que la multiplication des entiers de Church peut
+   s'écrire : $\lambda npf.(n\; (p\; f))$. Écrire le type de la
+   multiplication en utilisant $N_{\alpha}$ partout où c'est possible.
+3. L'exponentielle $n^p$ peut être calculée en utilisant le terme
+  $(\lambda np. (p\; n))$. Typer ce terme en utilisant des $N_{\alpha}$. Est-il
+   possible d'utiliser un même $\alpha$ partout ?
+
+** rogrammation récursive.
+On suppose que le $\lambda$-calcul est étendu avec des symboles pour les
+entiers et les booléens et quelques opérations courantes, comme =if=
+qui prend en entrée un booléen et deux termes $t_1$ et $t_2$ et se
+réduit en $t_1$ si le booléen est vrai, ou $t_2$ si le booléen est faux
+ainsi que =pred= pour calculer
+le prédécesseur.
+
+ On suppose aussi qu'il existe une fonction =premier= qui lorsqu'on
+l'applique à un symbole entier répond vrai si l'entier est un nombre
+premier ou s'il est nul et faux sinon. En $\lambda$-calcul, écrire une
+fonction récursive qui prend en entrée un nombre entier $n$ et
+retourne le plus grand nombre premier $p\leq n$ ou zéro s'il n'y en a
+pas. Vous pouvez utiliser des extensions vues en cours.
+
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
+
+
+
+
+\noindent\hrulefill
+
+#+BEGIN_LaTeX
+\begin{multicols}{2}
+#+END_LaTeX
+
+* Machine abstraite de Krivine
+On rappelle les règles de la KAM en évaluation par nom :
+#+BEGIN_LaTeX
+\newcommand{\kpush}[3]{\RightLabel{push}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+\newcommand{\kpop}[3]{\RightLabel{pop}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+\newcommand{\kderef}[3]{\RightLabel{deref}\UIC{\ensuremath{#1\qquad
+#2\qquad #3}}}
+#+END_LaTeX
+
+#+BEGIN_LaTeX
+\begin{gather*}
+\AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{(u, e)\cons\pi}
+\tabDP
+\\
+\AXC{$\lambda x. t\qquad e\qquad c:\pi$}\kpop{t}{e, x\cons c}{\pi}
+\tabDP
+\\
+\AXC{$x\qquad e,x:(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
+\tabDP
+\end{gather*}
+#+END_LaTeX
+
+Et les règles de la KAM en évaluation par valeur par priorité
+décroissante :
+#+BEGIN_LaTeX
+\newcommand{\kswap}[3]{\RightLabel{swap}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+#+END_LaTeX
+
+#+BEGIN_LaTeX
+\begin{gather*}
+\AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{A(u, e)\cons\pi}
+\tabDP
+\\
+\AXC{$\lambda x. t\qquad e\qquad A(u, e')\cons\pi$}\kswap{u}{e'}{F(\lambda x.t, e)\cons\pi}
+\tabDP
+\\
+\AXC{$x\qquad e,x:(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
+\tabDP
+\\
+\AXC{$v\qquad e\qquad F(\lambda x. t, e')\cons\pi$}\kpop{t}{e',x:(v, e)}{\pi}
+\tabDP
+\end{gather*}
+#+END_LaTeX
+
+** Évaluation.
+évaluer le terme $(\lambda z.z \; (\lambda x. x \;\lambda y. y))$ sur la KAM par nom,
+puis sur la KAM par valeur.
+
+\columnbreak
+* Extension de la KAM
+
+On étend le lambda-calcul simplement typé, en ajoutant le type =Unit=,
+une valeur =unit= de type =Unit= et la mise en séquence (qui n'est
+que du sucre syntaxique). Ces extensions sont gérées nativement par la
+machine de Krivine (élimination du sucre syntaxique ou
+utilisation du fait que =unit= est une valeur et de la règle pop).
+
+ On ajoute également un terme =[emit "hello"]= de type =Unit=. Ce
+terme n'est pas une valeur. L'idée est que ce terme se réduira en
+=unit= en /émettant un HELLO/. On étend la machine de Krivine en
+ajoutant la règle :
+
+#+BEGIN_LaTeX
+\newcommand{\kemit}[3]{\RightLabel{HELLO}\UIC{\ensuremath{#1}\qquad
+\ensuremath{#2}\qquad \ensuremath{#3}}}}
+\AXC{$\texttt{[emit "hello"]}\qquad e\qquad \pi$}\kemit{\texttt{unit}}{e}{\pi}
+\tabDP
+#+END_LaTeX
+
+Au moment où cette règle est utilisée on dit que la machine émet un HELLO.
+
+** Bonjour Monde.
+Évaluer le terme $\texttt{[emit "hello"]}; \lambda x. x$ par valeur puis par
+nom sur la KAM.
+** Bonjour par nom.
+Trouver un terme qui s'évalue sur la KAM par nom en émettant un HELLO
+et sur la KAM par valeur sans émettre de HELLO. (Donner les deux évaluations).
+IMPOSSIBLE
+#+BEGIN_LaTeX
+\end{multicols}
+#+END_LaTeX
