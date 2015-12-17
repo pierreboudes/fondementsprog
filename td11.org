@@ -20,7 +20,7 @@
 #+LATEX_HEADER: \usepackage{multicol}
 #+LATEX_HEADER: \usepackage{bussproofs}
 #+LATEX_HEADER: \usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
-#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 11 lambda-calcul\end{center}}}\smallskip}
+#+LATEX_HEADER: \renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 11 : extensions, type safety, machine de Krivine\end{center}}}\smallskip}
 #+LATEX_HEADER: \usepackage{fancyhdr}
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
@@ -64,12 +64,13 @@ t := \ldots &\mid \texttt{match } t \texttt{ with } \\
 &\quad\texttt{ case } \text{mot}_1\; x_1 \Rightarrow t_1\\
 &\qquad\vdots\\
 &\quad\texttt{ case } \text{mot}_n\; x_n\Rightarrow t_n\\
-&\mid \text{mot } t\texttt{ as }T
+&\mid \text{mot } t\texttt{ as }T\\
+v := \ldots &\mid \text{mot } t\texttt{ as }T
 \end{align*}
 #+END_LaTeX
 
 Remarque : sans ce « $\texttt{as }T$ » on perdrait l'unicité du type
-associé à un terme (on aurait par exemple $\text{Vrai} unit$ de type
+associé à un terme (on aurait par exemple $\text{Vrai} \texttt{unit}$ de type
 $\{\text{Vrai}: \texttt{Unit}\}$ mais aussi de type $\{\text{Vrai}:
 \texttt{Unit}, \text{Faux}: \texttt{Unit}\}$, ou de type $\text{Vrai}:
 \texttt{Unit}, \text{Saispas}: \texttt{Unit}\}$ etc.).
@@ -85,7 +86,7 @@ Règles de réduction.
 \tabDP\\
 \AXC{}
 \UIC{\shortstack[l]{
-$\texttt{match } \text{mot}_i\; t\texttt{ as } T  \texttt{ with }$ \\
+$\texttt{match } \text{m}_i\; t\texttt{ as } T  \texttt{ with }$ \\
 $\qquad\quad\texttt{ case } \text{mot}_1\; x_1 \Rightarrow t_1$\\
 $\qquad\qquad\vdots$\\
 $\qquad\quad\texttt{ case } \text{mot}_n\; x_n\Rightarrow t_n$\\
@@ -105,6 +106,9 @@ Règles de typage.
 $\Gamma\vdash\texttt{match } t\texttt{ as } \{\ldots, m_i: T_i,\ldots\}  \texttt{ with }$ \\
 $\qquad\ldots\texttt{ case } m_i\; x_i \Rightarrow t_i\ldots\quad : T$
 }}
+\tabDP\\
+\AXC{$\Gamma\vdash t_i: T_i$}
+\UIC{$\Gamma\vdash  \text{m}_i\; t_i\texttt{ as } \{\ldots, m_i: T_i, \ldots\}: \{\ldots, m_i: T_i, \ldots\}$}
 \tabDP
 \end{gather*}
 #+END_LaTeX
