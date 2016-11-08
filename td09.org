@@ -29,8 +29,8 @@
 \EnableBpAbbreviations
 \pagestyle{fancyplain}
 \fancyhf{}
-\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Le Roux et V. Mogbil}}
-\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
 \rfoot{ \fancyplain{}{\thepage}}
 %\rfoot{ }
 \newcounter{questioncount}
@@ -99,7 +99,7 @@ le type associé à la variable $x$ au moment du jugement de typage :
 #+BEGIN_LaTeX
   \begin{gather*}
     \AXC{$\Gamma, x:A\vdash t:B$}\RL{abs.}
-    \UIC{$\Gamma \vdash \lambda x[A]. t:A \to B$}
+    \UIC{$\Gamma \vdash \lambda x[A]. t:A \Rightarrow B$}
   \DP
   \end{gather*}
 #+END_LaTeX
@@ -121,8 +121,7 @@ du langage PCF, /programming/ /computable/ /functions/).
     t &:= \ldots \mid \texttt{unit}\\
     v &:= \ldots \mid \texttt{unit}\\
     T &:= \ldots \mid \texttt{Unit}
-  \end{align*}
-  \begin{gather*}
+  \end{align*}  \begin{gather*}
     \AXC{}
     \UIC{$\Gamma \vdash   \texttt{unit} : \texttt{Unit}$}\DP
   \end{gather*}
@@ -257,16 +256,16 @@ lambda-calcul.
 
 ** Letrec
 *** Question de partiel.
-Dans un letrec qu'est-ce qui s'apparente à du sucre syntaxique (ou une
+Dans un =letrec= qu'est-ce qui s'apparente à du sucre syntaxique (ou une
 forme dérivée) et qu'est ce qui est une véritable extension du
 lambda-calcul simplement typé ?
 *** Fonctions récursives.
-Définir factorielle à l'aide d'un letrec puis supprimer le sucre
+Définir factorielle à l'aide d'un =letrec= puis supprimer le sucre
 syntaxique. De même pour la fonction de Fibonacci.
 
 *** Récursion.
-La plupart du temps un letrec sert à définir une fonction, c'est à
-dire un terme de type $T_1\to T_2$, pour un certain $T_1$ et un
+La plupart du temps un =letrec= sert à définir une fonction, c'est à
+dire un terme de type $T_1\Rightarrow T_2$, pour un certain $T_1$ et un
 certain $T_2$. Pouvez-vous trouver une expression définie
 récursivement et qui soit d'un type autre qu'une flèche ?
 

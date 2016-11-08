@@ -28,8 +28,8 @@
 #+BEGIN_LaTeX
 \pagestyle{fancyplain}
 \fancyhf{}
-\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Le Roux et V. Mogbil}}
-\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
 \rfoot{ \fancyplain{}{\thepage}}
 %\rfoot{ }
 \newcounter{questioncount}
@@ -92,15 +92,11 @@ libre est simplement une variable qui n'est pas liée.
 
 
 Lorsqu'on écrit un lambda-terme sous forme d'arbre syntaxique, les
-$\lambda. x$ sont des nœuds unaires, les applications sont des nœuds
+$\lambda x. \dots$ sont des nœuds unaires, les applications sont des nœuds
 binaires, habituellement dénotés par le symbole @, et les variables
 correspondent aux feuilles. On peut alors ajouter à cet arbre
-syntaxique des arcs liant chaque variable liée au lambda qui la lie.
-
-Le lambda qui lie une variable est le premier lambda portant
-sur le même symbole de variable que l'on rencontre en remontant de la
-variable (qui est une feuille) vers la racine de l'arbre. Une variable
-libre est une feuille sans arc sortant.
+syntaxique des arcs orientés. Pour chaque variable liée on dessine un
+arc allant au lambda qui la lie (le premier lambda en remontant vers la racine).
 
 Avec les arcs lieurs on obtient une arbre appelé arbre du
 lambda-terme. Un exemple est donné figure 1.
@@ -131,6 +127,11 @@ lambda-terme. Un exemple est donné figure 1.
 %\end{figure}
 #+END_LaTeX
 
+# Le lambda qui lie une variable est le premier lambda portant sur le
+# même symbole de variable que l'on rencontre en remontant de la
+# variable (qui est une feuille) vers la racine de l'arbre. Une
+# occurrence de variable libre est une feuille sans arc sortant.
+
 Deux termes dont les arbres sont égaux sauf éventuellement pour le nom
 de leurs variables liées sont dits $\alpha$-équivalents. On peut
 toujours renommer n'importe quelle variable liée d'un terme ou d'un
@@ -141,25 +142,27 @@ $u$ dans un terme $t$ consiste en remplacer dans l'arbre de $t$ chaque
 feuille $x$ non liée par l'arbre de $u$. On note $t[x:=u]$ le
 lambda-terme obtenu.
 
-Si on n'y prend pas garde on risque la capture de variables des
+Si on n'y prend pas garde on risque la /capture/ de variables : des
 variables qui étaients libres dans $u$ se retrouvent liées dans
 $t[x:=u]$. On considéra uniquement la substitution sans capture de
 variables. C'est à dire que l'opération de substitution n'a de sens qu'à
-$\alpha$-renommage près, de tel sorte que tout capture de variable
-libre de $u$ par un lieur de $t$ soit évité par un renommage des
+$\alpha$-renommage près. Toute capture d'une variable
+libre de $u$ par un lieur de $t$ sera évitée par un renommage des
 variables liées de $t$ en choisissant des noms différents des
-variables libre de $u$.
+variables libres de $u$.
 
-Un terme de la forme $((\lambda x. t)\; u)$ est
-appelé un *rédex*. Il se $\beta$ réduit en une étape en le terme
-$t[x:=u]$. Un rédex peut aussi apparaître dans un sous-terme (une
-sous-expression).
+Un terme de la forme $((\lambda x. t)\; u)$ est appelé un *rédex*. Il
+se $\beta$ réduit en une étape en le terme $t[x:=u]$. Un rédex peut
+aussi apparaître dans un sous-terme (une sous-expression). L'idée est
+celle de l'application d'une fonction à un argument : l'argument se
+substitue à la variable de la fonction.
 
 Un terme sans rédex est dit en forme normale.
 
-Un terme peut avoir plusieurs rédex comme sous-termes. La $\beta$-réduction peut alors
-s'appliquer à n'importe lequel des sous-termes. Le choix du rédex à
-réduire peut éventuellement être fixé par une stratégie de réduction.
+Un terme peut avoir plusieurs rédex comme sous-termes. La
+$\beta$-réduction peut alors s'appliquer à n'importe lequel des
+sous-termes. Le choix du rédex à réduire peut éventuellement être déterminé
+par une stratégie de réduction.
 
 Partant d'un terme avec rédex si on arrive à une forme normale alors elle
 est unique, quel que soit le chemin de réduction.
@@ -167,7 +170,6 @@ est unique, quel que soit le chemin de réduction.
 #+BEGIN_LaTeX
 \end{multicols}
 #+END_LaTeX
-
 
 * Exercices
 
