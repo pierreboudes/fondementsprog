@@ -14,7 +14,7 @@
 #+STARTUP: latex nolatexpreview entitiesplain
 #+LaTeX_CLASS: article
 #+LATEX_CLASS_OPTIONS: [11pt, a4paper]
-#+LATEX_HEADER: \usepackage[margin=2cm]{geometry}
+#+LATEX_HEADER: \usepackage[margin=1.8cm]{geometry}
 #+LATEX_HEADER: \usepackage[table]{xcolor}
 #+LATEX_HEADER: \usepackage{xspace}
 #+LATEX_HEADER: \usepackage{multicol}
@@ -29,8 +29,8 @@
 \EnableBpAbbreviations
 \pagestyle{fancyplain}
 \fancyhf{}
-\lhead{ \fancyplain{}{$\vcenter{\hbox{\includegraphics[scale=0.12]{../img/Logo_SPC.jpg}}}$ Institut Galilée. P. Boudes, J. Le Roux et V. Mogbil}}
-\rhead{ \fancyplain{}{Master 1 informatique 2015-2016}}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
 \rfoot{ \fancyplain{}{\thepage}}
 %\rfoot{ }
 \newcounter{questioncount}
@@ -51,12 +51,13 @@
 
 
 
-On se donne un ensemble $L$ de mots (par exemple les chaînes de
-caractères \{A-Z,a-z\} commençant par une majuscule) ou étiquettes. Un
-*type somme* est la donnée d'un dictionnaire fini dont les clés sont
-des mots et dont les valeurs sont des types: $\{\text{mot}_1: T_1, \ldots,
-\text{mot}_n: T_n\}$. On étend les types avec les types sommes et les
-termes avec le pattern-matching.
+On se donne un ensemble $L$ de mots
+# (par exemple les chaînes de
+# caractères \{A-Z,a-z\} commençant par une majuscule)
+ou étiquettes. Un *type somme* est la donnée d'un dictionnaire fini
+dont les clés sont des mots et dont les valeurs sont des types:
+$\{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}$. On étend les types
+avec les types sommes et les termes avec le pattern-matching.
 #+BEGIN_LaTeX
 \begin{align*}
 T := \ldots &\mid \{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}\\
@@ -70,9 +71,9 @@ v := \ldots &\mid \text{mot } t\texttt{ as }T
 #+END_LaTeX
 
 Remarque : sans ce « $\texttt{as }T$ » on perdrait l'unicité du type
-associé à un terme (on aurait par exemple $\text{Vrai} \texttt{unit}$ de type
+associé à un terme (on aurait par exemple $\text{Vrai}\;\texttt{unit}$ de type
 $\{\text{Vrai}: \texttt{Unit}\}$ mais aussi de type $\{\text{Vrai}:
-\texttt{Unit}, \text{Faux}: \texttt{Unit}\}$, ou de type $\text{Vrai}:
+\texttt{Unit}, \text{Faux}: \texttt{Unit}\}$, ou de type $\{\text{Vrai}:
 \texttt{Unit}, \text{Saispas}: \texttt{Unit}\}$ etc.).
 
 Règles de réduction.
@@ -101,7 +102,7 @@ Règles de typage.
 #+BEGIN_LaTeX
 \begin{gather*}
 \AXC{$\Gamma\vdash t: \{\ldots, m_i: T_i, \ldots\}$}
-\AXC{$\Gamma, x_i : T_i\vdash t_i: T (\forall i)$}
+\AXC{$\Gamma, x_i : T_i\vdash t_i: T \quad(\forall i)$}
 \BIC{\shortstack[l]{
 $\Gamma\vdash\texttt{match } t\texttt{ as } \{\ldots, m_i: T_i,\ldots\}  \texttt{ with }$ \\
 $\qquad\ldots\texttt{ case } m_i\; x_i \Rightarrow t_i\ldots\quad : T$
@@ -140,25 +141,22 @@ TODO Appel par nom, paresse (par nécessité). En cours
 #+END_COMMENT
 
 
-La *machine abstraite de Krivine (KAM)* implémente l'appel par nom en
-$\lambda$-calcul.
-
 #+BEGIN_LaTeX
 \newcommand{\cons}{\mathrel{::}}
 #+END_LaTeX
-*KAM par nom*.
-On définit les termes, les environnements, les clôtures et les piles
-en posant:
+
+La *machine abstraite de Krivine (KAM)* implémente l'appel par nom en
+$\lambda$-calcul. On définit 4 notions :
 - terme :: $t := x\mid (t\; t)\mid \lambda x. t$
 - environnement :: $e := \emptyset \mid e, x:c$ (un dictionnaire
   associant des clôtures à des variables)
 - clôture :: $c := (t, e)$
 - pile :: $\pi := \varepsilon \mid c\cons\pi$
 L'état de la machine est représenté par un triplet fait d'un terme
-d'un environnement et d'une pile. Intialement on se donne un terme (un
-programme) et l'environnement et la pile sont vides. Une étape de
-réduction fait passer d'un état à l'état suivant à l'aide des trois
-règles suivantes :
+d'un environnement et d'une pile. On se donne un terme initial (un
+programme) avec un environnement et une pile vide. Une étape de
+réduction fait passer d'un état à l'état suivant en appliquant trois
+règles :
 #+BEGIN_LaTeX
 \newcommand{\kpush}[3]{\RightLabel{push}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
 \newcommand{\kpop}[3]{\RightLabel{pop}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
@@ -193,15 +191,15 @@ déroule ainsi:
 #+END_LaTeX
 Le résultat est $y$ (plus aucune règle ne s'applique).
 
-
 La *KAM par valeur* est définie en modifiant
 les piles de façon à ce qu'elles contiennent deux sortes d'éléments
 (/fonctions/ et /arguments/) :
 - pile :: $\pi = \varepsilon \mid F c \cons \pi \mid A c  \cons \pi$
-Les règles sont, par priorités décroissantes:
 #+BEGIN_LaTeX
 \newcommand{\kswap}[3]{\RightLabel{swap}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
 #+END_LaTeX
+
+Les règles sont, par priorités décroissantes:
 
 #+BEGIN_LaTeX
 \begin{gather*}
