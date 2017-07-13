@@ -12,7 +12,7 @@
 #+LINK_HOME:
 #+XSLT:
 #+STARTUP: latex nolatexpreview entitiesplain
-#+LaTeX_CLASS: article
+#+LATEX_CLASS: article
 #+LATEX_CLASS_OPTIONS: [11pt, a4paper]
 #+LATEX_HEADER: \usepackage[margin=1.8cm]{geometry}
 #+LATEX_HEADER: \usepackage[table]{xcolor}
@@ -25,7 +25,7 @@
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \EnableBpAbbreviations
 \pagestyle{fancyplain}
 \fancyhf{}
@@ -40,14 +40,17 @@
 \newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
 \newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
 \newcommand{\fix}{\mathop{\texttt{fix}}}
-#+END_LaTeX
+#+END_EXPORT
 
 
 
 
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
+
+
 
 
 
@@ -58,7 +61,8 @@ ou étiquettes. Un *type somme* est la donnée d'un dictionnaire fini
 dont les clés sont des mots et dont les valeurs sont des types:
 $\{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}$. On étend les types
 avec les types sommes et les termes avec le pattern-matching.
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
 \begin{align*}
 T := \ldots &\mid \{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}\\
 t := \ldots &\mid \texttt{match } t \texttt{ with } \\
@@ -68,7 +72,7 @@ t := \ldots &\mid \texttt{match } t \texttt{ with } \\
 &\mid \text{mot } t\texttt{ as }T\\
 v := \ldots &\mid \text{mot } t\texttt{ as }T
 \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 
 Remarque : sans ce « $\texttt{as }T$ » on perdrait l'unicité du type
 associé à un terme (on aurait par exemple $\text{Vrai}\;\texttt{unit}$ de type
@@ -77,7 +81,8 @@ $\{\text{Vrai}: \texttt{Unit}\}$ mais aussi de type $\{\text{Vrai}:
 \texttt{Unit}, \text{Saispas}: \texttt{Unit}\}$ etc.).
 
 Règles de réduction.
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
 \begin{gather*}
 \AXC{$t\to t'$}
 \UIC{$\texttt{match }t\texttt{ with}\ldots\to\texttt{match }t'\texttt{ with}\ldots$}
@@ -96,10 +101,10 @@ $\to {t_i[x_i:=t]}$
 }
 \tabDP
 \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Règles de typage.
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
 \AXC{$\Gamma\vdash t: \{\ldots, m_i: T_i, \ldots\}$}
 \AXC{$\Gamma, x_i : T_i\vdash t_i: T \quad(\forall i)$}
@@ -112,8 +117,7 @@ $\qquad\ldots\texttt{ case } m_i\; x_i \Rightarrow t_i\ldots\quad : T$
 \UIC{$\Gamma\vdash  \text{m}_i\; t_i\texttt{ as } \{\ldots, m_i: T_i, \ldots\}: \{\ldots, m_i: T_i, \ldots\}$}
 \tabDP
 \end{gather*}
-#+END_LaTeX
-
+#+END_EXPORT
 
 
 *Théorème de préservation.* Si $\Gamma \vdash t: T$ et $t\to t'$,
@@ -140,10 +144,9 @@ une stratégie particulière).
 TODO Appel par nom, paresse (par nécessité). En cours
 #+END_COMMENT
 
-
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \newcommand{\cons}{\mathrel{::}}
-#+END_LaTeX
+#+END_EXPORT
 
 La *machine abstraite de Krivine (KAM)* implémente l'appel par nom en
 $\lambda$-calcul. On définit 4 notions :
@@ -157,14 +160,15 @@ d'un environnement et d'une pile. On se donne un terme initial (un
 programme) avec un environnement et une pile vide. Une étape de
 réduction fait passer d'un état à l'état suivant en appliquant trois
 règles :
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
 \newcommand{\kpush}[3]{\RightLabel{push}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
 \newcommand{\kpop}[3]{\RightLabel{pop}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
 \newcommand{\kderef}[3]{\RightLabel{deref}\UIC{\ensuremath{#1\qquad
 #2\qquad #3}}}
-#+END_LaTeX
+#+END_EXPORT
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
 \AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{(u, e)\cons\pi}
 \tabDP
@@ -175,12 +179,12 @@ règles :
 \AXC{$x\qquad e,x:(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
 \tabDP
 \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Par exemple, l'évaluation du terme $((\lambda x. x)\; y)$ sur la KAM par nom se
 déroule ainsi:
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
 \AXC{$((\lambda x. x)\; y) \qquad \emptyset\qquad \varepsilon$}
 \kpush{\lambda x. x}{\emptyset}{(y, \emptyset)}
@@ -188,20 +192,23 @@ déroule ainsi:
 \kderef{y}{\emptyset}{\varepsilon}
 \DP
 \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
+
+
 Le résultat est $y$ (plus aucune règle ne s'applique).
 
 La *KAM par valeur* est définie en modifiant
 les piles de façon à ce qu'elles contiennent deux sortes d'éléments
 (/fonctions/ et /arguments/) :
 - pile :: $\pi = \varepsilon \mid F c \cons \pi \mid A c  \cons \pi$
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
 \newcommand{\kswap}[3]{\RightLabel{swap}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
-#+END_LaTeX
+#+END_EXPORT
 
 Les règles sont, par priorités décroissantes:
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
 \AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{A(u, e)\cons\pi}
 \tabDP
@@ -215,7 +222,7 @@ Les règles sont, par priorités décroissantes:
 \AXC{$v\qquad e\qquad F(\lambda x. t, e')\cns\pi$}\kpop{t}{e',x=:(v, e)}{\pi}
 \tabDP
 \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Dans cette dernière règle, $v$ désigne une valeur c'est à dire ici un
 lambda-terme qui n'est pas une application (donc une variable ou un lambda).

@@ -8,7 +8,7 @@
 #+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS:   TeX:t LaTeX:nil skip:nil d:nil todo:t pri:nil tags:not-in-toc toc:nil
 #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-#+EXPORT_SELECT_TAGS: export
+#+EXPORT_SELECT_TAGS: export correction
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+LINK_UP:
 #+LINK_HOME:
@@ -129,7 +129,7 @@ de Church $\lambda fx. (f \; (f \; (f x)))$.
   $(\lambda np. (p\; n))$. Typer ce terme en utilisant des $N_{\alpha}$. Est-il
    possible d'utiliser un même $\alpha$ partout ?
 
-** rogrammation récursive.
+** Programmation récursive.
 On suppose que le $\lambda$-calcul est étendu avec des symboles pour les
 entiers et les booléens et quelques opérations courantes, comme =if=
 qui prend en entrée un booléen et deux termes $t_1$ et $t_2$ et se
@@ -147,6 +147,19 @@ pas. Vous pouvez utiliser des extensions vues en cours.
 #+BEGIN_LaTeX
 \end{multicols}
 #+END_LaTeX
+#+BEGIN_SRC :correction
+
+(if b t1 t2) se réduit en t1 si b est vrai et en t2 sinon.
+
+En pseudo-langage (pseudo OCaml) la fonction f cherchée pourrait être définie comme ceci :
+let rec f n = if (premier n) n (f (pred n)) in f
+
+Ou en écrivant explicitant l'abstraction selon le paramètre de f :
+let rec f = \lambda n. (if (premier n) n (f (pred n))) in f
+ce qui par définition de let rec s'écrirait avec un combinateur de point fixe  Fix comme ceci :
+let f = (fix \lambda f[].\lambda n. (if (premier n) n (f (pred n)))).
+
+#+END_SRC
 
 
 
@@ -154,7 +167,8 @@ pas. Vous pouvez utiliser des extensions vues en cours.
 \noindent\hrulefill
 
 #+BEGIN_LaTeX
-\begin{multicols}{2}
+%\begin{multicols}{2}
+\newpage
 #+END_LaTeX
 
 * Machine abstraite de Krivine
@@ -171,7 +185,7 @@ On rappelle les règles de la KAM en évaluation par nom :
 \AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{(u, e)\cons\pi}
 \tabDP
 \\
-\AXC{$\lambda x. t\qquad e\qquad c:\pi$}\kpop{t}{e, x\cons c}{\pi}
+\AXC{$\lambda x. t\qquad e\qquad c\cons \pi$}\kpop{t}{e, x:c}{\pi}
 \tabDP
 \\
 \AXC{$x\qquad e,x:(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
@@ -206,6 +220,33 @@ décroissante :
 puis sur la KAM par valeur.
 
 \columnbreak
+
+*** Par nom                                                      :correction:
+#+BEGIN_LaTeX
+\AXC{$(\lambda z.z \; (\lambda x. x \;\lambda y. y))\qquad \emptyset \qquad \varepsilon$}
+\kpush{\lambda z.z}{\emptyset}{((\lambda x. x \;\lambda y. y),\emptyset)}
+\kpop{z}{z:((\lambda x. x \;\lambda y. y),\emptyset)}{\varepsilon}
+\kderef{(\lambda x.x\; \lambda y.y)}{\emptyset}{\varepsilon}
+\kpush{\lambda x.x}{\emptyset}{(\lambda y. y, \emptyset)}
+\kpop{x}{x:(\lambda y. y, \emptyset)}{\varepsilon}
+\kderef{\lambda y.y}{\emptyset}{\varepsilon}
+\tabDP
+#+END_LaTeX
+
+*** Par valeur                                                   :correction:
+#+BEGIN_LaTeX
+\AXC{$(\lambda z.z \; (\lambda x.x \;\lambda y.y))\qquad \emptyset \qquad \varepsilon$}
+\kpush{\lambda z.z}{\emptyset}{A((\lambda x.x \;\lambda y.y),\emptyset)}
+\kswap{(\lambda x.x \;\lambda y. y)}{\emptyset}{F(\lambda z.z,\emptyset)}
+\kpush{\lambda x.x}{\emptyset}{A(\lambda y.y,\emptyset)::F(\lambda z.z,\emptyset)}
+\kswap{(\lambda y.y}{\emptyset}{F(\lambda x.x,\emptyset)::F(\lambda z.z,\emptyset)}
+\kpop{x}{x:\lambda y.y}{F(\lambda z.z,\emptyset)}
+\kderef{\lambda y.y}{\emptyset}{F(\lambda z.z,\emptyset)}
+\kpop{z}{z:\lambda y.y}{\varepsilon}
+\kderef{\lambda y.y}{\emptyset}{\varepsilon}
+\tabDP
+#+END_LaTeX
+
 * Extension de la KAM
 
 On étend le lambda-calcul simplement typé, en ajoutant le type =Unit=,
@@ -231,10 +272,40 @@ Au moment où cette règle est utilisée on dit que la machine émet un HELLO.
 ** Bonjour Monde.
 Évaluer le terme $\texttt{[emit "hello"]}; \lambda x. x$ par valeur puis par
 nom sur la KAM.
+
+*** Correction :correction:
+#+BEGIN_LaTeX
+\newcommand{\hello}{\texttt{[emit "hello"]}}
+#+END_LaTeX
+
+On commence par éliminer le sucre syntaxique. Le terme $\hello; \lambda x.
+x$ s'écrit : $$(\lambda y.\lambda x.x\; \hello).$$
+
+
+**** Par nom
+#+BEGIN_LaTeX
+\AXC{$(\lambda y.\lambda x.x\; \hello)\qquad\emptyset\qquad \varepsilon$}
+\kpush{\lambda y.\lambda x.x}{\emptyset}{(\hello, \emptyset)}
+\kpop{\lambda x.x}{y:(\hello,\emptyset)}{\varepsilon}
+\tabDP
+#+END_LaTeX
+
+Et c'est tout puisque la pile est vide. Le résultat est $\lambda x.x$ (une valeur).
+
+#+BEGIN_LaTeX
+\AXC{$(\lambda y.\lambda x.x\; \hello)\qquad\emptyset\qquad \varepsilon$}
+\kpush{\lambda y.\lambda x.x}{\emptyset}{A(\hello, \emptyset)}
+\kswap{\hello}{\emptyset}{F(\lambda y.\lambda x.x,\emptyset)}
+\kemit{\texttt{unit}}{\emptyset}{F(\lambda y.\lambda x.x, \emptyset)}
+\kpop{\lambda x.x}{y:(\texttt{unit},\emptyset)}{\varepsilon}
+\tabDP
+#+END_LaTeX
 ** Bonjour par nom.
 Trouver un terme qui s'évalue sur la KAM par nom en émettant un HELLO
-et sur la KAM par valeur sans émettre de HELLO. (Donner les deux évaluations).
-IMPOSSIBLE
+et sur la KAM par valeur sans émettre de HELLO. (Donner les deux
+évaluations).
+*** Correction
+C'est IMPOSSIBLE !
 #+BEGIN_LaTeX
-\end{multicols}
+%\end{multicols}
 #+END_LaTeX
