@@ -25,7 +25,7 @@
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \pagestyle{fancyplain}
 \fancyhf{}
 \lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
@@ -36,14 +36,14 @@
 \setcounter{questioncount}{0}
 \newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
 \renewcommand{\subsubsection}[1]{\question[#1.]}
-#+END_LaTeX
+#+END_EXPORT
 
 
 
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
 
 Un lambda-terme $t$ est une expression syntaxique qui est soit
 simplement une variable, soit l'abstraction d'un autre lambda-terme
@@ -69,24 +69,24 @@ parenthésées à gauche: $((x\; y)\; z)$.
 
 L'ensemble des variables libres d'un lambda-terme est défini par
 induction sur le terme :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \newcommand{\FV}[1]{\ensuremath{\operatorname{FV}(#1)}}
   \begin{align*}
     \FV x &= \{x\}\\
     \FV{\lambda x. t} &= \FV{t} - \{x\}\\
     \FV{(t\; u)} &= \FV{t} \cup \FV{u}
   \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 De même, l'ensemble des variables liées d'un lambda-terme est défini
 par induction sur le terme :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \newcommand{\BV}[1]{\ensuremath{\operatorname{BV}(#1)}}
   \begin{align*}
     \BV x &= \emptyset \\
     \BV{\lambda x. t} &= \BV{t} \cup \{x\}\\
     \BV{(t\; u)} &= \BV{t} \cup \BV{u}
  \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 Remarques : ce sont les lambdas qui lient les variables; une variable
 libre est simplement une variable qui n'est pas liée.
 
@@ -101,7 +101,7 @@ arc allant au lambda qui la lie (le premier lambda en remontant vers la racine).
 Avec les arcs lieurs on obtient une arbre appelé arbre du
 lambda-terme. Un exemple est donné figure 1.
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 %\begin{figure}[htbp]
 \begin{wrapfigure}{r}{0.2\textwidth}
 \vspace{-0.7cm}~\hspace{-0.5cm}
@@ -125,7 +125,7 @@ lambda-terme. Un exemple est donné figure 1.
 \caption{arbre du terme $\lambda xy. ((x\; y)\; y)$}
 \end{wrapfigure}
 %\end{figure}
-#+END_LaTeX
+#+END_EXPORT
 
 # Le lambda qui lie une variable est le premier lambda portant sur le
 # même symbole de variable que l'on rencontre en remontant de la
@@ -167,9 +167,9 @@ par une stratégie de réduction.
 Partant d'un terme avec rédex si on arrive à une forme normale alors elle
 est unique, quel que soit le chemin de réduction.
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 
 * Exercices
 
@@ -177,51 +177,51 @@ est unique, quel que soit le chemin de réduction.
 *** Variables libres et liées
 Donner l'ensemble des variables libres et l'ensemble des variables liées
 des termes suivants :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{3}
-#+END_LaTeX
+#+END_EXPORT
 1. $(x\; y)$
 2. $(x\; (\lambda y. y))$
 3. $\lambda xyz. (x\; (y\; z))$
 4. $((\lambda xyz. (x\; y))\; z)$
 5. $((\lambda x. (x\; y))\; x)$
 6. $((\lambda x. x)\;(\lambda x. x))$
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 *** $\alpha$-équivalence
 Pour chacun des deux derniers termes de l'exercice précédent donner un terme qui lui est
 $\alpha$-équivalent et utilise un maximum de noms de variables.
 ** Substitution, réductions
 *** Substitutions
 Effectuer les substitutions suivantes :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{3}
-#+END_LaTeX
+#+END_EXPORT
 1. $x[x:=y]$
 2. $(x\; y)[x:=\lambda z. z]$
 3. $(x\; x)[x:=\lambda z. z]$
 4. $(x\; x)[y:=\lambda z. z]$
 5. $((\lambda x. (x\; y))\; x)[x:=z]$
 6. $((\lambda x. (x\; y))\; y)[y:=z]$
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 
 *** Réductions
 Réduire et donner la forme normale des termes suivants :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
 1. $((\lambda x. x)\;((\lambda x. x)\;(\lambda x. x)))$
 2. $((\lambda x. (x\; x))\;(\lambda z. z))$
 3. $((\lambda xy. y)\; f\; g)$
 4. $((\lambda xy. (x\; (x\; (x\; y))))\; (\lambda x.z))$
 5. $((\lambda x. (x\; x))\;(\lambda x. (x\; x)))$
 6. $((\lambda f.(\lambda x.f (x\; x))\; (\lambda x.f (x\; x)))\; g)$
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 ** Entiers de Church
  On se donne un ensemble de lambda-termes pour représenter les entiers
  naturels. On représente le zéro par le terme $\lambda fx. x$, le un

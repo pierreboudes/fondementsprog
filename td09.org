@@ -25,7 +25,7 @@
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \EnableBpAbbreviations
 \pagestyle{fancyplain}
 \fancyhf{}
@@ -40,17 +40,16 @@
 \newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
 \newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
 \newcommand{\fix}{\mathop{\texttt{fix}}}
-#+END_LaTeX
+#+END_EXPORT
 
 
 
-
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
 
-Stratégie d'évaluation : *appel par valeur.* Nous allons maintenant restreindre la
-$\beta$-réduction de façon à ce qu'elle corresponde à la façon dont
+Stratégie d'évaluation : *appel par valeur.* Nous allons maintenant
+restreindre la \beta-réduction de façon à ce qu'elle corresponde à la façon dont
 les programmes sont évalués dans la plupart des langages de
 programmation. On distingue un ensemble particulier de termes appelés
 valeurs au delà desquels on ne (\beta-)réduit plus. En l'absence
@@ -73,7 +72,7 @@ avant de donner une valeur au deuxième paramètre, y.
 On se donne
 ensuite des règles d'évaluation qui déterminent exactement l'ordre dans
 lequel il faut faire les réductions dans un terme.
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{gather*}
   \AXC{}
   \UIC{$(\lambda x. t_1\; v_2) \to t_1[x:=v_2]$}\tabDP\\
@@ -84,7 +83,7 @@ lequel il faut faire les réductions dans un terme.
     \UIC{$(v_1\; t_2)\to (v_1\; t'_2)$}
   \tabDP
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Le point important dans cet ensemble de règles est qu'il n'y a pas de
 règle qui permette de réduire sous une abstraction.
@@ -96,13 +95,14 @@ d'évaluation possibles.
 simplement typé où chaque variable liée par un lambda est annotée par
 un type, comme ceci : $\lambda x[T]. t$, de telle sorte que $T$ soit
 le type associé à la variable $x$ au moment du jugement de typage :
-#+BEGIN_LaTeX
+
+#+BEGIN_EXPORT latex
   \begin{gather*}
     \AXC{$\Gamma, x:A\vdash t:B$}\RL{abs.}
     \UIC{$\Gamma \vdash \lambda x[A]. t:A \Rightarrow B$}
   \DP
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 De cette façon, étant donné un contexte de typage $\Gamma$, et un
 terme $t$ ainsi annoté il existe au plus un type $T$ tel que
 $\Gamma\vdash t: T$.
@@ -116,7 +116,7 @@ du langage PCF, /programming/ /computable/ /functions/).
 
 *Unit*. On ajoute une valeur
 ~unit~  de type, ~Unit~.
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{align*}
     t &:= \ldots \mid \texttt{unit}\\
     v &:= \ldots \mid \texttt{unit}\\
@@ -126,17 +126,17 @@ du langage PCF, /programming/ /computable/ /functions/).
     \UIC{$\Gamma \vdash   \texttt{unit} : \texttt{Unit}$}\DP
   \end{gather*}
 
-#+END_LaTeX
+#+END_EXPORT
 Ceci nous permet d'introduire une /forme dérivée/:
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \[
 t_1;t_2 \eqdef (\lambda x[\texttt{Unit}]. t_2\;\; t_1)\quad (x\notin FV(t_2)).
 \]
-#+END_LaTeX
+#+END_EXPORT
 Cette mise en séquence, $t_1; t_2$ a pour effet d'évaluer
 $t_1$, de jeter son résultat, puis d'évaluer $t_2$. Les règles
 d'évaluation et de typage induites sur la forme sont :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{gather*}
   \AXC{$t_1\to t'_1$}
   \UIC{$t_1; t_2\to t'_1; t_2$}
@@ -148,10 +148,10 @@ d'évaluation et de typage induites sur la forme sont :
   \AXC{$\Gamma \vdash t_2: T_2$}
   \BIC{$\Gamma \vdash t_1; t_2: T_2$}\tabDP
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 *Let in*.  On peut également se donner la forme syntaxique \texttt{let in}
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
     \begin{gather*}
      t := \ldots \mid \texttt{let }x = t\texttt{ in } t\\
     \AXC{}
@@ -163,7 +163,7 @@ d'évaluation et de typage induites sur la forme sont :
   \BIC{\Gamma\vdash \texttt{let }x = t_1\texttt{ in } t_2 :  T_2$}
   \tabDP
     \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Au premier abord, cette forme $\texttt{let }x = t_1\texttt{ in } t_2$
 est juste du sucre syntaxique pour $(\lambda x[T_1]. t_2\; t_1)$. Pour
@@ -172,7 +172,7 @@ $\lambda x$, donc faire l'inférence de type avant.
 
 *Combinateur de point fixe*. Pour chaque type $T_1$ on se donne
  un  opérateur sur les termes ~fix~ tel que :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{gather*}
     t := \ldots \mid (\fix\; t)\\
   \AXC{}
@@ -182,28 +182,29 @@ $\lambda x$, donc faire l'inférence de type avant.
 \AXC{$\Gamma \vdash t_1: T_1\to T_1$}
 \UIC{$\Gamma \vdash (\fix \; t_1): T_1$}
 \tabDP  \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
 Forme dérivée:
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{align*}
  &\texttt{letrec } x =  t_1 \texttt{ in }   t_2 \\
 &\eqdef
   \texttt{let } x = (\fix \;\lambda x[T_1]. t_1) \texttt{ in }   t_2
   \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 
 
-On peut construire des types de données composées, le plus simple d'entre eux étant les *paires* :
-#+BEGIN_LaTeX
+On peut construire des types de données composées, le plus simple
+d'entre eux étant les *paires* :
+#+BEGIN_EXPORT latex
   \begin{align*}
     t &:= \ldots \mid \{t, t\} \mid t.1 \mid t.2\\
     v &:= \ldots \mid \{t, t\}\\
     T &:= \ldots \mid T_1\times T_2
   \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 Règles de réduction des paires :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{gather*}
   \AXC{$t\to t'$}
 \LL{$i = 1, 2$}
@@ -220,9 +221,9 @@ Règles de réduction des paires :
   \UIC{$\{v_1, t_2\}\to \{v_1, t'_2\}$}
   \tabDP
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 Règles de typage des paires :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
   \AXC{$\Gamma \vdash t_1: T_1$}
   \AXC{$\Gamma \vdash t_2: T_2$}
@@ -233,11 +234,11 @@ Règles de typage des paires :
 \LL{$i = 1, 2$}
 \DP
 \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 
 * Exercices
 
@@ -294,25 +295,25 @@ T'$, alors $\Gamma \vdash t[x:=t'] : T$.
 
 ** Combinateur de point fixe Y de Church
 Soit :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
    Y = \lambda f.(\lambda x.f (x\; x)) (\lambda x.f (x\; x))
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 Dans le lambda-calcul pur, pour $f$ terme quelconque, montrer que $(Y f) \equiv_{\beta} (f (Y f))$.
 
 *** Solution
 On montre que $(Y\; f)$ est $\beta$ equivalent à $(f (Y
 f))$, c'est à dire qu'il y a un terme en lequel se réduisent chacun de
 ces deux termes.
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{align*}
     (Y\; f)&= (\lambda f.(\lambda x.f (x\; x)) (\lambda x.f (x\; x))\;
     f)\\
   &\to_{\beta} \underbrace{((\lambda x.f (x\; x))\; (\lambda x.f (x\; x)))}_{t}\\
   &\to_{\beta} (f \; \underbrace{((\lambda x.f (x\; x))\;(\lambda x.f (x\; x)))}_{t})
   \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 On a $(Y\; f)\to_{\beta}  t$, donc $(f\;(Y\; f))\to_{\beta} (f\; t)$
 et $(Y\; f)\to_{\beta} (f\; t)$ donc ces deux termes sont $\beta$-équivalents.
 

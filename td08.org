@@ -25,7 +25,7 @@
 #+LATEX_HEADER: \usepackage[french]{babel}
 #+EXCLUDE_TAGS: noexport correction
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \EnableBpAbbreviations
 \pagestyle{fancyplain}
 \fancyhf{}
@@ -37,14 +37,14 @@
 \setcounter{questioncount}{0}
 \newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
 \renewcommand{\subsubsection}[1]{\question[#1.]}
-#+END_LaTeX
+#+END_EXPORT
 
 
 
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
 
 
 
@@ -60,13 +60,13 @@ induction sur la syntaxe.
 
 Intuitivement cela se fait comme ceci (mais nous allons voir qu'il y a
 un problème).
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather}
 t := x^A \mid \overbrace{ \lambda x^A. t^B }^{A\implies B} \mid ( \overbrace{ u^{A\implies B} v^A) }^{B}
 \label{intuit}
 \end{gather}
 %\vspace{-\baselineskip}
-#+END_LaTeX
+#+END_EXPORT
 Une variable est toujours typable, et on peut lui donner
 n'importe quel type. Si $u$ est un lambda-terme typable auquel on peut
 donner le type $A\implies B$ et si $v$ est un lambda-terme typable auquel
@@ -95,7 +95,7 @@ Un jugement de typage $\Gamma \vdash t: A$ permet d'associer un type
 $A$ à un terme $t$ dans un contexte $\Gamma$. On peut alors formaliser
 l'induction précédente en disant qu'un jugement de typage est valide
 s'il peut être dérivé grâce aux régles suivantes :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{gather*}
     \AXC{}\RL{id}
   \UIC{$\Gamma, x:A\vdash x:A$}
@@ -108,7 +108,7 @@ s'il peut être dérivé grâce aux régles suivantes :
   \BIC{$\Gamma \vdash (u\; v): B$}
   \DP
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 Le point important est que pour la règle d'application, $u$ et $v$ ont
 été typés en utilisant un même contexte, c'est à dire en donnant le
 même type aux variables de même nom. Si un jugement de typage est
@@ -148,17 +148,17 @@ Le calcul typé est fortement normalisant : n'importe quelle série de
 réductions amène à une forme normale (et cette forme normale est unique
 pour tous les chemins de réduction). Il n'est donc pas Turing complet.
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 
 * Exercices
 
 ** Inférence de type
 Donner un type à chacun des termes suivants, lorsque c'est possible :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{multicols}{2}
-#+END_LaTeX
+#+END_EXPORT
 
 1. $\lambda x. x$
 2. $\lambda xf. (f\; (f\; (f\; x)))$
@@ -169,9 +169,9 @@ Donner un type à chacun des termes suivants, lorsque c'est possible :
 7. $\lambda f.(\lambda x.(f\; (x\; x))) (\lambda x.(f\; (x\; x)))$
 10. Les entiers de Church et les opérations sur ces entiers.
 
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \end{multicols}
-#+END_LaTeX
+#+END_EXPORT
 
 
 ** Terme non typable
@@ -203,25 +203,25 @@ prédécesseur sur les entiers de Church, c'est à dire tel que appliqué
 
 ** Combinateur de point fixe Y de Church
 Soit :
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
 \begin{gather*}
    Y = \lambda f.(\lambda x.(f\; (x\; x))) (\lambda x.(f\; (x\; x)))
   \end{gather*}
-#+END_LaTeX
+#+END_EXPORT
 Dans le lambda-calcul pur, pour $f$ terme quelconque, montrer que $(Y f) \equiv_{\beta} (f (Y f))$.
 
 *** Solution                                                   :correction:
 On montre que $(Y\; f)$ est $\beta$ equivalent à $(f (Y
 f))$, c'est à dire qu'il y a un terme en lequel se réduisent chacun de
 ces deux termes.
-#+BEGIN_LaTeX
+#+BEGIN_EXPORT latex
   \begin{align*}
     (Y\; f)&= (\lambda f.(\lambda x.(f\; (x\; x))) (\lambda x.(f\; (x\; x)))\;
     f)\\
   &\to_{\beta} \underbrace{((\lambda x.(f\; (x\; x)))\; (\lambda x.(f\; (x\; x))))}_{t}\\
   &\to_{\beta} (f \; \underbrace{((\lambda x.(f\; (x\; x)))\;(\lambda x.(f\; (x\; x))))}_{t})
   \end{align*}
-#+END_LaTeX
+#+END_EXPORT
 On a $(Y\; f)\to_{\beta}  t$, donc $(f\;(Y\; f))\to_{\beta} (f\; t)$
 et $(Y\; f)\to_{\beta} (f\; t)$ donc ces deux termes sont $\beta$-équivalents.
 
