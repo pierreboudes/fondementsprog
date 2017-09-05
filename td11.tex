@@ -1,0 +1,314 @@
+% Created 2017-09-05 Tue 19:29
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{xspace}
+\usepackage{multicol}
+\usepackage{bussproofs}
+\usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
+\renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 11 : extensions, type safety, machine de Krivine\end{center}}}\smallskip}
+\usepackage{fancyhdr}
+\usepackage[french, frenchb]{babel}
+\author{Pierre Boudes}
+\date{\today}
+\title{Fondements de la programmation lambda-calcul}
+\hypersetup{
+ pdfauthor={Pierre Boudes},
+ pdftitle={Fondements de la programmation lambda-calcul},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.1.1 (Org mode 9.0.9)},
+ pdflang={Frenchb}}
+\begin{document}
+
+\maketitle
+\EnableBpAbbreviations
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsection}[1]{\question[#1]}
+\newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
+\newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
+\newcommand{\fix}{\mathop{\texttt{fix}}}
+
+
+
+
+
+\begin{multicols}{2}
+
+
+
+
+
+On se donne un ensemble \(L\) de mots
+
+ou étiquettes. Un \textbf{type somme} est la donnée d'un dictionnaire fini
+dont les clés sont des mots et dont les valeurs sont des types:
+\(\{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}\). On étend les types
+avec les types sommes et les termes avec le pattern-matching.
+
+\begin{align*}
+T := \ldots &\mid \{\text{mot}_1: T_1, \ldots, \text{mot}_n: T_n\}\\
+t := \ldots &\mid \texttt{match } t \texttt{ with } \\
+&\quad\texttt{ case } \text{mot}_1\; x_1 \Rightarrow t_1\\
+&\qquad\vdots\\
+&\quad\texttt{ case } \text{mot}_n\; x_n\Rightarrow t_n\\
+&\mid \text{mot } t\texttt{ as }T\\
+v := \ldots &\mid \text{mot } t\texttt{ as }T
+\end{align*}
+
+Remarque : sans ce « \(\texttt{as }T\) » on perdrait l'unicité du type
+associé à un terme (on aurait par exemple \(\text{Vrai}\;\texttt{unit}\) de type
+\(\{\text{Vrai}: \texttt{Unit}\}\) mais aussi de type \(\{\text{Vrai}:
+\texttt{Unit}, \text{Faux}: \texttt{Unit}\}\), ou de type \(\{\text{Vrai}:
+\texttt{Unit}, \text{Saispas}: \texttt{Unit}\}\) etc.).
+
+Règles de réduction.
+
+\begin{gather*}
+\AXC{$t\to t'$}
+\UIC{$\texttt{match }t\texttt{ with}\ldots\to\texttt{match }t'\texttt{ with}\ldots$}
+\tabDP\\
+\AXC{$t\to t'$}
+\UIC{$\text{mot}\; t\texttt{ as } T\to \text{mot } t'\texttt{ as } T$}
+\tabDP\\
+\AXC{}
+\UIC{\shortstack[l]{
+$\texttt{match } \text{m}_i\; t\texttt{ as } T  \texttt{ with }$ \\
+$\qquad\quad\texttt{ case } \text{mot}_1\; x_1 \Rightarrow t_1$\\
+$\qquad\qquad\vdots$\\
+$\qquad\quad\texttt{ case } \text{mot}_n\; x_n\Rightarrow t_n$\\
+$\to {t_i[x_i:=t]}$
+}
+}
+\tabDP
+\end{gather*}
+
+Règles de typage.
+\begin{gather*}
+\AXC{$\Gamma\vdash t: \{\ldots, m_i: T_i, \ldots\}$}
+\AXC{$\Gamma, x_i : T_i\vdash t_i: T \quad(\forall i)$}
+\BIC{\shortstack[l]{
+$\Gamma\vdash\texttt{match } t\texttt{ as } \{\ldots, m_i: T_i,\ldots\}  \texttt{ with }$ \\
+$\qquad\ldots\texttt{ case } m_i\; x_i \Rightarrow t_i\ldots\quad : T$
+}}
+\tabDP\\
+\AXC{$\Gamma\vdash t_i: T_i$}
+\UIC{$\Gamma\vdash  \text{m}_i\; t_i\texttt{ as } \{\ldots, m_i: T_i, \ldots\}: \{\ldots, m_i: T_i, \ldots\}$}
+\tabDP
+\end{gather*}
+
+
+\textbf{Théorème de préservation.} Si \(\Gamma \vdash t: T\) et \(t\to t'\),
+alors \(\Gamma\vdash t': T\). Ceci est valable pour le lambda-calcul
+simplement typé comme pour les extensions présentées ici. La
+réciproque est en générale fausse.
+
+\textbf{Théorème de progression.} Si \(\vdash t: T\) (notez le contexte vide),
+alors soit \(t\) est une valeur, soit il existe \(t'\) tel que \(t\to t'\).
+
+\textbf{Type safety}. Un langage est dit sûr au niveau du typage (\emph{type}
+\emph{safe}) lorsqu'il possède les deux propriétés précédentes
+(préservation et progression), éventuellement en élargissant la
+propriété de progression de façon à permettre au calcul de terminer
+sur des erreurs (des exceptions) aussi bien que sur des valeurs. Notez
+que la progression n'implique pas la terminaison.
+
+
+\textbf{Théorème de normalisation forte.} En lambda-calcul simplement typé
+la \$\(\beta\)\$-réduction termine toujours (sans avoir besoin d'utiliser
+une stratégie particulière).
+
+\newcommand{\cons}{\mathrel{::}}
+
+La \textbf{machine abstraite de Krivine (KAM)} implémente l'appel par nom en
+\$\(\lambda\)\$-calcul. On définit 4 notions :
+\begin{description}
+\item[{terme}] \(t := x\mid (t\; t)\mid \lambda x. t\)
+\item[{environnement}] \(e := \emptyset \mid e, x:c\) (un dictionnaire
+associant des clôtures à des variables)
+\item[{clôture}] \(c := (t, e)\)
+\item[{pile}] \(\pi := \varepsilon \mid c\cons\pi\)
+\end{description}
+L'état de la machine est représenté par un triplet fait d'un terme
+d'un environnement et d'une pile. On se donne un terme initial (un
+programme) avec un environnement et une pile vide. Une étape de
+réduction fait passer d'un état à l'état suivant en appliquant trois
+règles :
+
+\newcommand{\kpush}[3]{\RightLabel{push}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+\newcommand{\kpop}[3]{\RightLabel{pop}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+\newcommand{\kderef}[3]{\RightLabel{deref}\UIC{\ensuremath{#1\qquad
+#2\qquad #3}}}
+
+\begin{gather*}
+\AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{(u, e)\cons\pi}
+\tabDP
+\\
+\AXC{$\lambda x. t\qquad e\qquad c:\pi$}\kpop{t}{e, x\cons c}{\pi}
+\tabDP
+\\
+\AXC{$x\qquad e,x:(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
+\tabDP
+\end{gather*}
+
+Par exemple, l'évaluation du terme \(((\lambda x. x)\; y)\) sur la KAM par nom se
+déroule ainsi:
+
+\begin{gather*}
+\AXC{$((\lambda x. x)\; y) \qquad \emptyset\qquad \varepsilon$}
+\kpush{\lambda x. x}{\emptyset}{(y, \emptyset)}
+\kpop{x}{x:(y, \emptyset)}{\varepsilon}
+\kderef{y}{\emptyset}{\varepsilon}
+\DP
+\end{gather*}
+
+
+Le résultat est \(y\) (plus aucune règle ne s'applique).
+
+La \textbf{KAM par valeur} est définie en modifiant
+les piles de façon à ce qu'elles contiennent deux sortes d'éléments
+(\emph{fonctions} et \emph{arguments}) :
+\begin{description}
+\item[{pile}] \(\pi = \varepsilon \mid F c \cons \pi \mid A c  \cons \pi\)
+\end{description}
+
+\newcommand{\kswap}[3]{\RightLabel{swap}\UIC{\ensuremath{#1\qquad #2\qquad #3}}}
+
+Les règles sont, par priorités décroissantes:
+
+\begin{gather*}
+\AXC{$(t\; u)\qquad e\qquad \pi$}\kpush{t}{e}{A(u, e)\cons\pi}
+\tabDP
+\\
+\AXC{$\lambda x. t\qquad e\qquad A(u, e')\cons\pi$}\kswap{u}{e'}{F(\lambda x.t, e)\cons\pi}
+\tabDP
+\\
+\AXC{$x\qquad e,x=(t, e')\qquad \pi$}\kderef{t}{e'}{\pi}
+\tabDP
+\\
+\AXC{$v\qquad e\qquad F(\lambda x. t, e')\cns\pi$}\kpop{t}{e',x=:(v, e)}{\pi}
+\tabDP
+\end{gather*}
+
+Dans cette dernière règle, \(v\) désigne une valeur c'est à dire ici un
+lambda-terme qui n'est pas une application (donc une variable ou un lambda).
+
+Par exemple, l'évaluation du terme \(((\lambda x. x)\; y)\) sur la KAM par valeur se
+déroule ainsi:
+$$
+\AXC{$((\lambda x. x)\; y) \qquad \emptyset\qquad \varepsilon$}
+\kpush{\lambda x. x}{\emptyset}{A(y, \emptyset)}
+\kswap{y}{\emptyset}{F(\lambda x. x, \emptyset)}
+\kpop{x}{x=(y, \emptyset)}{\varepsilon}
+\kderef{y}{\emptyset}{\varepsilon}
+\DP
+$$
+
+
+
+\section{Exercices}
+\label{sec:org33e1c23}
+\subsection{Préservation.}
+\label{sec:org4fdcbe1}
+Prouver le théorème de préservation pour le \$\(\lambda\)\$-calcul
+simplement typé.
+
+\subsection{Normalisation forte.}
+\label{sec:orge0c3444}
+Pourquoi ne prouve t'on pas le théorème de normalisation forte du
+lambda-calcul simplement typé par induction sur les termes ?
+
+
+\subsection{Morris.}
+\label{sec:orgeaea601}
+En C que vaut Morris(1, 0) ? Citer un langage dans lequel cette
+fonction s'évaluerait différemment.
+
+\begin{verbatim}
+int Morris(int a, int b)
+{
+  if (a == 0) {
+    return 1;
+  }
+  else {
+    return Morris(a - 1, Morris(a, b));
+  }
+}
+\end{verbatim}
+
+
+\subsection{Scala.}
+\label{sec:orgea0f8a3}
+En Scala, \texttt{val} est l'équivalent du \texttt{let} de Caml, il
+permet d'introduire une variable immutable dont la valeur est obtenue en
+appel par valeur, \texttt{var} permet d'introduire une variable
+mutable dont la valeur est également fixée en appel par valeur,
+\texttt{def} permet d'introduire une variable immutable en appel par
+nom et \texttt{lazy val} est une variante de \texttt{val} qui est
+évaluée paresseusement, en appel par nécessité. Un bloc d'instructions
+(entre accolades) s'évalue comme la dernière valeur du bloc. Sauriez
+vous dire quelle ligne de code provoque quel affichage dans l'extrait
+de programme Scala suivant ?
+
+\begin{verbatim}
+val x = {println("x"); 1}
+var y = {println("y"); 2}
+def z = {println("z"); 3}
+lazy val w = {println("w"); 4}
+x + x
+y + y
+z + z
+w + w
+\end{verbatim}
+
+
+\subsection{KAM par nom.}
+\label{sec:org72ea082}
+Donner l'exécution de la KAM par nom sur le terme \((((\lambda xy. x)\; z)\;
+z')\).
+
+
+\subsection{KAM par valeur.}
+\label{sec:org06faa17}
+Donner l'exécution de la KAM par valeur sur le terme \((((\lambda xy. x)\; z)\;
+z')\).
+
+
+\subsection{KAM (partiel 2015).}
+\label{sec:org1e4f6e0}
+On veut comparer le temps d'exécution de la KAM par nom et de la
+KAM par valeur. Pour mesurer ce temps on compte le nombre de règles appliquées
+dans chaque exécution mais \textbf{sans compter} les applications la règle
+\emph{swap}. Ainsi les exécutions des deux machines sur le terme \(((\lambda x.
+x)\; y)\) prennent autant de temps (3 règles hors règle \emph{swap}).
+\begin{enumerate}
+\item Est-ce encore le cas sur le terme \((((\lambda xy. x)\; z)\; z')\) ?
+\item Les deux machines ont-elles toujours les mêmes temps d'exécution
+ou bien pouvez-vous trouver un terme pour
+lequel la KAM par nom est plus rapide et/ou un terme pour lequel la
+KAM par valeur est plus rapide ? Justifier par un raisonnement ou
+en donnant des exemples de termes et leurs exécutions.
+\end{enumerate}
+\end{document}

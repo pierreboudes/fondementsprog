@@ -1,0 +1,273 @@
+% Created 2017-09-05 Tue 19:35
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[margin=2cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{xspace}
+\usepackage{multicol}
+\usepackage{bussproofs}
+\usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
+\renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 9 et 10 lambda-calcul\end{center}}}\smallskip}
+\usepackage{fancyhdr}
+\usepackage[french, frenchb]{babel}
+\author{Pierre Boudes}
+\date{\today}
+\title{Fondements de la programmation lambda-calcul}
+\hypersetup{
+ pdfauthor={Pierre Boudes},
+ pdftitle={Fondements de la programmation lambda-calcul},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.1.1 (Org mode 9.0.9)},
+ pdflang={Frenchb}}
+\begin{document}
+
+\maketitle
+\EnableBpAbbreviations
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsubsection}[1]{\question[#1]}
+\newcommand{\tabDP}{\shortstack{\smallskip\\\DisplayProof\smallskip}}
+\newcommand{\eqdef}{\mathrel{\shortstack{\scriptsize\text{def}\\=}}}
+\newcommand{\fix}{\mathop{\texttt{fix}}}
+
+
+
+\begin{multicols}{2}
+
+Stratégie d'évaluation : \textbf{appel par valeur.} Nous allons maintenant
+restreindre la \(\beta\)-réduction de façon à ce qu'elle corresponde à la façon dont
+les programmes sont évalués dans la plupart des langages de
+programmation. On distingue un ensemble particulier de termes appelés
+valeurs au delà desquels on ne (\(\beta\)-)réduit plus. En l'absence
+d'extensions du lambda-calcul, qui viendront après, les valeurs sont
+tous les termes qui correspondent à une abstraction :
+\[
+v := \lambda x. t
+\]
+Intuitivement, on ne réduit pas dans le corps des fonctions tant
+qu'elles ne sont pas complètement appliquées.
+
+On se donne
+ensuite des règles d'évaluation qui déterminent exactement l'ordre dans
+lequel il faut faire les réductions dans un terme.
+\begin{gather*}
+\AXC{}
+\UIC{$(\lambda x. t_1\; v_2) \to t_1[x:=v_2]$}\tabDP\\
+  \AXC{$t_1 \to t'_1$}
+  \UIC{$(t_1\; t_2)\to (t'_1\; t_2)$}
+\tabDP\quad
+  \AXC{$t_2 \to t'_2$}
+  \UIC{$(v_1\; t_2)\to (v_1\; t'_2)$}
+\tabDP
+\end{gather*}
+
+Le point important dans cet ensemble de règles est qu'il n'y a pas de
+règle qui permette de réduire sous une abstraction.
+
+Nous reviendrons plus en détails sur les différentes stratégies
+d'évaluation possibles.
+
+\textbf{Unicité du typage.} Nous utilisons désormais une version du lambda-calcul
+simplement typé où chaque variable liée par un lambda est annotée par
+un type, comme ceci : \(\lambda x[T]. t\), de telle sorte que \(T\) soit
+le type associé à la variable \(x\) au moment du jugement de typage :
+
+\begin{gather*}
+  \AXC{$\Gamma, x:A\vdash t:B$}\RL{abs.}
+  \UIC{$\Gamma \vdash \lambda x[A]. t:A \Rightarrow B$}
+\DP
+\end{gather*}
+De cette façon, étant donné un contexte de typage \(\Gamma\), et un
+terme \(t\) ainsi annoté il existe au plus un type \(T\) tel que
+\(\Gamma\vdash t: T\).
+
+Nous allons maintenant
+donner des \textbf{extensions du lambda-calcul} \textbf{simplement typé} de façon à en
+faire un langage de programmation, Turing-complet et ayant les
+caractéristiques d'un langage de type ML (les langages ML comme SML,
+CAML sont inspirés des extensions du lambda-calcul et en particulier
+du langage PCF, \emph{programming} \emph{computable} \emph{functions}).
+
+\textbf{Unit}. On ajoute une valeur
+\texttt{unit}  de type, \texttt{Unit}.
+\begin{align*}
+  t &:= \ldots \mid \texttt{unit}\\
+  v &:= \ldots \mid \texttt{unit}\\
+  T &:= \ldots \mid \texttt{Unit}
+\end{align*}  \begin{gather*}
+  \AXC{}
+  \UIC{$\Gamma \vdash   \texttt{unit} : \texttt{Unit}$}\DP
+\end{gather*}
+Ceci nous permet d'introduire une \emph{forme dérivée}:
+\[
+t_1;t_2 \eqdef (\lambda x[\texttt{Unit}]. t_2\;\; t_1)\quad (x\notin FV(t_2)).
+\]
+Cette mise en séquence, \(t_1; t_2\) a pour effet d'évaluer
+\(t_1\), de jeter son résultat, puis d'évaluer \(t_2\). Les règles
+d'évaluation et de typage induites sur la forme sont :
+\begin{gather*}
+\AXC{$t_1\to t'_1$}
+\UIC{$t_1; t_2\to t'_1; t_2$}
+\tabDP\quad
+\AXC{}
+\UIC{$\texttt{unit}; t_2 \to t_2$}\tabDP
+\\
+\AXC{$\Gamma \vdash t_1 : \texttt{Unit}$}
+\AXC{$\Gamma \vdash t_2: T_2$}
+\BIC{$\Gamma \vdash t_1; t_2: T_2$}\tabDP
+\end{gather*}
+
+\textbf{Let in}.  On peut également se donner la forme syntaxique \texttt{let in}
+  \begin{gather*}
+   t := \ldots \mid \texttt{let }x = t\texttt{ in } t\\
+  \AXC{}
+  \UIC{$\texttt{let }x = v_1\texttt{ in } t_2 \to t_2[x := v_1]$}\tabDP\\
+  \AXC{$t_1 \to t'_1$}
+  \UIC{$\texttt{let }x = t_1\texttt{ in } t_2 \to \texttt{let }x = t'_1\texttt{ in } t_2 $}\tabDP\\
+\AXC{$\Gamma \vdash t_1: T_1$}
+\AXC{$\Gamma, x : T_1 \vdash t_2: T_2$}
+\BIC{\Gamma\vdash \texttt{let }x = t_1\texttt{ in } t_2 :  T_2$}
+\tabDP
+  \end{gather*}
+
+Au premier abord, cette forme \(\texttt{let }x = t_1\texttt{ in } t_2\)
+est juste du sucre syntaxique pour \((\lambda x[T_1]. t_2\; t_1)\). Pour
+\emph{désugariser} il faudra toutefois trouver l'annotation de type pour
+\(\lambda x\), donc faire l'inférence de type avant.
+
+\textbf{Combinateur de point fixe}. Pour chaque type \(T_1\) on se donne
+ un  opérateur sur les termes \texttt{fix} tel que :
+  \begin{gather*}
+    t := \ldots \mid (\fix\; t)\\
+  \AXC{}
+  \UIC{$(\fix \;\lambda x[T_1]. t_2) \to t_2 [x:=(\fix \;\lambda x[T_1]. t_2)]$}\tabDP\\
+  \AXC{$t_1 \to t'_1$}
+  \UIC{$\fix\; t_1 \to \fix\; t'_1$}\tabDP\\
+\AXC{$\Gamma \vdash t_1: T_1\to T_1$}
+\UIC{$\Gamma \vdash (\fix \; t_1): T_1$}
+\tabDP  \end{gather*}
+
+Forme dérivée:
+  \begin{align*}
+ &\texttt{letrec } x =  t_1 \texttt{ in }   t_2 \\
+&\eqdef
+  \texttt{let } x = (\fix \;\lambda x[T_1]. t_1) \texttt{ in }   t_2
+  \end{align*}
+
+
+On peut construire des types de données composées, le plus simple
+d'entre eux étant les \textbf{paires} :
+\begin{align*}
+  t &:= \ldots \mid \{t, t\} \mid t.1 \mid t.2\\
+  v &:= \ldots \mid \{t, t\}\\
+  T &:= \ldots \mid T_1\times T_2
+\end{align*}
+Règles de réduction des paires :
+  \begin{gather*}
+  \AXC{$t\to t'$}
+\LL{$i = 1, 2$}
+  \UIC{$t.i\to t'.i$}
+  \tabDP\quad
+  \AXC{}
+\RL{$i = 1, 2$}
+  \UIC{$\{v_1, v_2\}.i \to v_i$}\tabDP
+  \\
+  \AXC{$t_1\to t'_1$}
+  \UIC{$\{t_1, t_2\}\to \{t'_1, t_2\}$}
+  \tabDP\quad
+  \AXC{$t_2\to t'_2$}
+  \UIC{$\{v_1, t_2\}\to \{v_1, t'_2\}$}
+  \tabDP
+  \end{gather*}
+Règles de typage des paires :
+\begin{gather*}
+  \AXC{$\Gamma \vdash t_1: T_1$}
+  \AXC{$\Gamma \vdash t_2: T_2$}
+  \BIC{$\Gamma \vdash \{t_1, t_2\}: T_1 \times T_2$}\DP
+\quad
+\AXC{$\Gamma \vdash t: T_1\times T_2$}
+\UIC{$\Gamma \vdash t.i : T_i$}
+\LL{$i = 1, 2$}
+\DP
+\end{gather*}
+
+\end{multicols}
+
+\section{Exercices}
+\label{sec:org3aeb5f3}
+
+\subsubsection{Typage.}
+\label{sec:org0287648}
+Typer les termes suivants en utilisant les extensions appropriées du
+lambda-calcul.
+\begin{enumerate}
+\item \(\texttt{let } f = \lambda xy. x \texttt{ in } \lambda abc. (f\;
+   (f\; a\; b)\; c)\).
+\item \((\lambda xy.x \; \texttt{unit} \; (\lambda z. z)); \lambda xy. y\)
+\item \((\fix \; \lambda x. x)\)
+\item \((\fix \; \lambda xy. x)\)
+\item \(\texttt{letrec } f = \lambda ghx. (g \; x\; (f\; g\; h\; (h\; x))
+   \; (h\; x))\texttt{ in } (f\; (\lambda xyz. z)\; (\lambda z. z))\)
+\item \(\lambda x. x.1\)
+\item \(\lambda xy. \{x, y\}\)
+\end{enumerate}
+
+\subsection{Letrec}
+\label{sec:org4ad5f32}
+\subsubsection{Question de partiel.}
+\label{sec:orge2a9fe2}
+Dans un \texttt{letrec} qu'est-ce qui s'apparente à du sucre syntaxique (ou une
+forme dérivée) et qu'est ce qui est une véritable extension du
+lambda-calcul simplement typé ?
+\subsubsection{Fonctions récursives.}
+\label{sec:org86d1dcc}
+Définir factorielle à l'aide d'un \texttt{letrec} puis supprimer le sucre
+syntaxique. De même pour la fonction de Fibonacci.
+
+\subsubsection{Récursion.}
+\label{sec:orgc8dafbd}
+La plupart du temps un \texttt{letrec} sert à définir une fonction, c'est à
+dire un terme de type \(T_1\Rightarrow T_2\), pour un certain \(T_1\) et un
+certain \(T_2\). Pouvez-vous trouver une expression définie
+récursivement et qui soit d'un type autre qu'une flèche ?
+
+\subsection{Preuves par induction sur les jugements de typage}
+\label{sec:org3f9171e}
+\subsubsection{Affaiblissement}
+\label{sec:org8bb73ba}
+(importation dans d'autres contextes).
+Prouver que, en lambda-calcul simplement typé, si \(\Gamma\vdash t: T\)
+alors pour n'importe quel \(x\not\in FV(t)\), \(\Gamma, x:T'\vdash t: T\).
+
+En déduire que si \(\Gamma\vdash t: T\)
+alors \(\Gamma,
+x_1:T_1, \ldots, x_n:T_n\vdash t: T\),  pour n'importe quels
+\(x_1,\ldots,x_n\not\in FV(t)\).
+
+\subsubsection{Substitution}
+\label{sec:orgbd1f1f1}
+(modularité et liaison.)
+Prouver que si \(\Gamma, x : T' \vdash t : T\) et \(\Gamma \vdash t' :
+T'\), alors \(\Gamma \vdash t[x:=t'] : T\).
+\end{document}

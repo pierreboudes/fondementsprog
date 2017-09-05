@@ -1,0 +1,256 @@
+% Created 2017-09-05 Tue 19:37
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage[margin=2cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{xspace}
+\usepackage{multicol}
+\usepackage{bussproofs}
+\usepackage{tikz}\usetikzlibrary{arrows,shapes,trees}
+\renewcommand{\maketitle}{{\bigskip{\begin{center}\Large\textbf{Fondements de la programmation}\\[0.1cm] Exercices 7 lambda-calcul\end{center}}}\smallskip}
+\usepackage{fancyhdr}
+\usepackage[french, frenchb]{babel}
+\author{P. Boudes}
+\date{\today}
+\title{Fondements de la programmation lambda-calcul}
+\hypersetup{
+ pdfauthor={P. Boudes},
+ pdftitle={Fondements de la programmation lambda-calcul},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.1.1 (Org mode 9.0.9)},
+ pdflang={Frenchb}}
+\begin{document}
+
+\maketitle
+\pagestyle{fancyplain}
+\fancyhf{}
+\lhead{ \fancyplain{}{\raisebox{-1ex}{\includegraphics[scale=0.10]{../img/logoLipnNoir.pdf}} P. Boudes, P. Jacobé de Naurois, D. Mazza, V. Mogbil}}
+\rhead{ \fancyplain{}{M1 informatique 2016-2017}}
+\rfoot{ \fancyplain{}{\thepage}}
+%\rfoot{ }
+\newcounter{questioncount}
+\setcounter{questioncount}{0}
+\newcommand{\question}[1][]{\addtocounter{questioncount}{1}\paragraph{Question \Alph{questioncount}. #1}}
+\renewcommand{\subsubsection}[1]{\question[#1.]}
+
+
+
+
+\begin{multicols}{2}
+
+Un lambda-terme \(t\) est une expression syntaxique qui est soit
+simplement une variable, soit l'abstraction d'un autre lambda-terme
+selon une variable, soit l'application d'un terme à un autre :
+
+\[
+  t := x \mid \lambda x. t \mid (t\; t)
+\]
+
+\noindent où \(x\) est n'importe quel élément d'un ensemble de symboles
+\(\mathcal{V}\) choisi une fois pour toute comme ensemble de variables.
+On utilise habituellement les lettres de l'alphabet \(a\), \(b\), \ldots,
+\(x\), \(y\), \(z\) éventuellement indexés par des entiers, \(x_{42}\), comme
+ensemble de variables. Il est habituel de raccourcir les notations des
+lambdas en notant \(\lambda x_1\ldots x_n. t\) au lieu de \(\lambda
+x_1.\lambda x_2.\ldots \lambda x_n. t\). Par exemple on écrira \(\lambda
+xy. x\) au lieu de \(\lambda x.\lambda y. x\). On doit parfois ajouter
+des parenthèses autour des sous-expressions \(\lambda x. t\) pour éviter
+une ambiguité. Par exemple, on écrit \(((\lambda x. x)\; y)\). Par
+contre on peut omettre nombre de parenthèses d'application en prenant
+comme convention que les expressions comme \(x\; y\; z\) sont
+parenthésées à gauche: \(((x\; y)\; z)\).
+
+L'ensemble des variables libres d'un lambda-terme est défini par
+induction sur le terme :
+\newcommand{\FV}[1]{\ensuremath{\operatorname{FV}(#1)}}
+  \begin{align*}
+    \FV x &= \{x\}\\
+    \FV{\lambda x. t} &= \FV{t} - \{x\}\\
+    \FV{(t\; u)} &= \FV{t} \cup \FV{u}
+  \end{align*}
+De même, l'ensemble des variables liées d'un lambda-terme est défini
+par induction sur le terme :
+\newcommand{\BV}[1]{\ensuremath{\operatorname{BV}(#1)}}
+  \begin{align*}
+    \BV x &= \emptyset \\
+    \BV{\lambda x. t} &= \BV{t} \cup \{x\}\\
+    \BV{(t\; u)} &= \BV{t} \cup \BV{u}
+ \end{align*}
+Remarques : ce sont les lambdas qui lient les variables; une variable
+libre est simplement une variable qui n'est pas liée.
+
+
+Lorsqu'on écrit un lambda-terme sous forme d'arbre syntaxique, les
+\(\lambda x. \dots\) sont des nœuds unaires, les applications sont des nœuds
+binaires, habituellement dénotés par le symbole @, et les variables
+correspondent aux feuilles. On peut alors ajouter à cet arbre
+syntaxique des arcs orientés. Pour chaque variable liée on dessine un
+arc allant au lambda qui la lie (le premier lambda en remontant vers la racine).
+
+Avec les arcs lieurs on obtient une arbre appelé arbre du
+lambda-terme. Un exemple est donné figure 1.
+
+%\begin{figure}[htbp]
+\begin{wrapfigure}{r}{0.2\textwidth}
+\vspace{-0.7cm}~\hspace{-0.5cm}
+\begin{tikzpicture}[level distance=1cm]
+  \node (lx) {$\lambda x$}
+    child { node (ly) {$\lambda y$}
+      child { node {@}
+        child { node {@}
+          child { node (x) {$x$} }
+          child { node (y1) {$y$} }
+        }
+        child { node (y2) {$y$} }
+      }
+   };
+  \path[->] (y1) edge [out=0, in = -20,  looseness = 1.2]  (ly);
+  \path[->] (y2) edge [out=40, in = -40,  looseness = 0.8] (ly);
+  \path[->] (x) edge [out=110, in = 250,  looseness = 1](lx);
+  \end{tikzpicture}
+\vspace{-0.5cm}
+\label{fig:as}
+\caption{arbre du terme $\lambda xy. ((x\; y)\; y)$}
+\end{wrapfigure}
+%\end{figure}
+
+Deux termes dont les arbres sont égaux sauf éventuellement pour le nom
+de leurs variables liées sont dits \$\(\alpha\)\$-équivalents. On peut
+toujours renommer n'importe quelle variable liée d'un terme ou d'un
+sous-terme pour obtenir un terme \$\(\alpha\)\$-équivalent.
+
+Sur les arbres, la \textbf{substitution} d'une variable libre \(x\) par un terme
+\(u\) dans un terme \(t\) consiste en remplacer dans l'arbre de \(t\) chaque
+feuille \(x\) non liée par l'arbre de \(u\). On note \(t[x:=u]\) le
+lambda-terme obtenu.
+
+Si on n'y prend pas garde on risque la \emph{capture} de variables : des
+variables qui étaients libres dans \(u\) se retrouvent liées dans
+\(t[x:=u]\). On considéra uniquement la substitution sans capture de
+variables. C'est à dire que l'opération de substitution n'a de sens qu'à
+\$\(\alpha\)\$-renommage près. Toute capture d'une variable
+libre de \(u\) par un lieur de \(t\) sera évitée par un renommage des
+variables liées de \(t\) en choisissant des noms différents des
+variables libres de \(u\).
+
+Un terme de la forme \(((\lambda x. t)\; u)\) est appelé un \textbf{rédex}. Il
+se \(\beta\) réduit en une étape en le terme \(t[x:=u]\). Un rédex peut
+aussi apparaître dans un sous-terme (une sous-expression). L'idée est
+celle de l'application d'une fonction à un argument : l'argument se
+substitue à la variable de la fonction.
+
+Un terme sans rédex est dit en forme normale.
+
+Un terme peut avoir plusieurs rédex comme sous-termes. La
+\$\(\beta\)\$-réduction peut alors s'appliquer à n'importe lequel des
+sous-termes. Le choix du rédex à réduire peut éventuellement être déterminé
+par une stratégie de réduction.
+
+Partant d'un terme avec rédex si on arrive à une forme normale alors elle
+est unique, quel que soit le chemin de réduction.
+
+\end{multicols}
+
+\section{Exercices}
+\label{sec:org6aa5038}
+
+\subsection{Variables libres, variables liées, alpha-équivalence}
+\label{sec:orgc64374a}
+\subsubsection{Variables libres et liées}
+\label{sec:orgfa2af5d}
+Donner l'ensemble des variables libres et l'ensemble des variables liées
+des termes suivants :
+\begin{multicols}{3}
+\begin{enumerate}
+\item \((x\; y)\)
+\item \((x\; (\lambda y. y))\)
+\item \(\lambda xyz. (x\; (y\; z))\)
+\item \(((\lambda xyz. (x\; y))\; z)\)
+\item \(((\lambda x. (x\; y))\; x)\)
+\item \(((\lambda x. x)\;(\lambda x. x))\)
+\end{enumerate}
+\end{multicols}
+\subsubsection{\$\(\alpha\)\$-équivalence}
+\label{sec:org9fcfdc6}
+Pour chacun des deux derniers termes de l'exercice précédent donner un terme qui lui est
+\$\(\alpha\)\$-équivalent et utilise un maximum de noms de variables.
+\subsection{Substitution, réductions}
+\label{sec:orgf10ca7b}
+\subsubsection{Substitutions}
+\label{sec:org6050be9}
+Effectuer les substitutions suivantes :
+\begin{multicols}{3}
+\begin{enumerate}
+\item \(x[x:=y]\)
+\item \((x\; y)[x:=\lambda z. z]\)
+\item \((x\; x)[x:=\lambda z. z]\)
+\item \((x\; x)[y:=\lambda z. z]\)
+\item \(((\lambda x. (x\; y))\; x)[x:=z]\)
+\item \(((\lambda x. (x\; y))\; y)[y:=z]\)
+\end{enumerate}
+\end{multicols}
+
+\subsubsection{Réductions}
+\label{sec:orgbb8a400}
+Réduire et donner la forme normale des termes suivants :
+\begin{multicols}{2}
+\begin{enumerate}
+\item \(((\lambda x. x)\;((\lambda x. x)\;(\lambda x. x)))\)
+\item \(((\lambda x. (x\; x))\;(\lambda z. z))\)
+\item \(((\lambda xy. y)\; f\; g)\)
+\item \(((\lambda xy. (x\; (x\; (x\; y))))\; (\lambda x.z))\)
+\item \(((\lambda x. (x\; x))\;(\lambda x. (x\; x)))\)
+\item \(((\lambda f.(\lambda x.f (x\; x))\; (\lambda x.f (x\; x)))\; g)\)
+\end{enumerate}
+\end{multicols}
+\subsection{Entiers de Church}
+\label{sec:orga775498}
+On se donne un ensemble de lambda-termes pour représenter les entiers
+naturels. On représente le zéro par le terme \(\lambda fx. x\), le un
+par le terme \(\lambda fx. (f\; x)\), le deux par le terme \(\lambda fx.
+ (f\; (f\; x))\) et plus généralement l'entier \(n\) est représenté par
+le terme noté \(\overline{n}\) : \[ \overline{n} := \lambda fx.
+ (\underbrace{f\;\ldots\; (f}_{n}\; x)). \] Cette représentation est
+appelée entiers de Church du nom du mathématicien Alonzo Church, qui
+inventa le lambda-calcul et montra que toutes les fonctions
+calculables sur les entiers peuvent être représentées par des
+lambda-termes en utilisant la \$\(\beta\)\$-réduction pour effectuer le
+calcul. Nous allons essayer de calculer un peu avec ses entiers.
+
+\subsubsection{Successeur}
+\label{sec:orgedd3c4e}
+Donner un lambda-terme \(\operatorname{succ}\) qui représente l'opération
+successeur sur les entiers de Church, c'est à dire tel que pour
+n'importe quel entier naturel \(n\), \((\operatorname{succ}\; \overline{n})\) se
+\$\(\beta\)\$-réduit en \(\overline{n + 1}\). Tester.
+
+\subsubsection{Addition}
+\label{sec:orgf779193}
+Donner un lambda-terme \(\operatorname{add}\) qui représente l'addition de
+deux entiers. C'est-à-dire tel que pour n'importe quels entiers \(n\) et
+\(n\), \((\operatorname{add}\; \overline{n}\; \overline{m})\) se
+\$\(\beta\)\$-réduit en \(\overline{n + m}\).
+
+\subsubsection{Multiplication}
+\label{sec:org67101b5}
+Même question pour la multiplication \(\overline{mult}\).
+\subsubsection{Test à zéro}
+\label{sec:org9144ad7}
+Donner un lambda-terme \(\operatorname{ifzero}\) qui, lorsqu'il est appliqué à un entier
+\(\overline{n}\) et deux termes \(t_1\) et \(t_2\), se \$\(\beta\)\$-réduit en \(t_1\)
+si \(n = 0\) et en \(t_2\) sinon.
+\end{document}
